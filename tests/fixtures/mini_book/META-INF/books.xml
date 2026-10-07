@@ -1,0 +1,4 @@
+<container xmlns="https://openstax.org/namespaces/book-container" version="1">
+    <book slug="mini-physics-volume-1" href="../collections/mini-volume-1.collection.xml" />
+    <book slug="mini-physics-volume-2" href="../collections/mini-volume-2.collection.xml" />
+</container>

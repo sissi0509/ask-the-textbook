@@ -1,0 +1,40 @@
+<col:collection xmlns="http://cnx.rice.edu/collxml" xmlns:md="http://cnx.rice.edu/mdml" xmlns:col="http://cnx.rice.edu/collxml">
+  <metadata xmlns:md="http://cnx.rice.edu/mdml">
+    <md:title>Mini Physics Volume 1</md:title>
+  </metadata>
+  <col:content>
+    <col:module document="p1"/>
+    <col:subcollection>
+      <md:title>Mechanics</md:title>
+      <col:content>
+        <col:subcollection>
+          <md:title>Motion</md:title>
+          <col:content>
+            <col:module document="a1"/>
+            <col:module document="a2"/>
+          </col:content>
+        </col:subcollection>
+        <col:subcollection>
+          <md:title>Forces</md:title>
+          <col:content>
+            <col:module document="b1"/>
+            <col:module document="b2"/>
+          </col:content>
+        </col:subcollection>
+      </col:content>
+    </col:subcollection>
+    <col:subcollection>
+      <md:title>Waves</md:title>
+      <col:content>
+        <col:subcollection>
+          <md:title>Sound</md:title>
+          <col:content>
+            <col:module document="c1"/>
+            <col:module document="c2"/>
+          </col:content>
+        </col:subcollection>
+      </col:content>
+    </col:subcollection>
+    <col:module document="z1"/>
+  </col:content>
+</col:collection>
