@@ -25,7 +25,7 @@ erDiagram
         text subsection_title "NULL before the first subsection"
         text chunk_type "text or definition"
         text content "what the LLM reads"
-        vector embedding "384 numbers, filled in T3"
+        vector embedding "384 numbers, bge-small"
     }
 ```
 
@@ -68,7 +68,7 @@ Filled by `tutor.ingest.load_chunks`. Re-running replaces a volume's chunks.
 | `subsection_title` | `Gravitation and Inertia` | The heading this chunk sits under. Used in citations and in front of the text when embedding |
 | `chunk_type` | `text` | `text` = a paragraph (with its equations); `definition` = a glossary entry |
 | `content` | `Mass is also related to inertia, …` | Readable text: math converted from MathML (`F⃗_net = 0⃗`) |
-| `embedding` | `[0.012, -0.08, …]` | 384-dimension vector from the embedding model (T3) |
+| `embedding` | `[0.012, -0.08, …]` | 384-dimension vector of the heading path + content, from `bge-small-en-v1.5`. Filled by `tutor.ingest.embed_chunks` |
 
 ## Example rows
 
