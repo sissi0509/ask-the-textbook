@@ -9,7 +9,7 @@ Writes a dated Markdown report to evals/results/.
 import argparse
 import json
 from collections import defaultdict
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 
 from tutor.db import connect
@@ -43,9 +43,10 @@ def main() -> None:
 
     cases = [json.loads(line) for line in CASES.read_text().splitlines() if line.strip()]
     types = sorted({c["type"] for c in cases})
-    lines = [f"# Retrieval eval, {date.today()}", "",
-             f"{len(cases)} cases ({', '.join(f'{t}: {sum(c['type'] == t for c in cases)}' for t in types)}). "
-             "Hit = a chunk from a gold section.", "",
+    today = datetime.now().astimezone().date()
+    counts = ", ".join(f"{t}: {sum(c['type'] == t for c in cases)}" for t in types)
+    lines = [f"# Retrieval eval, {today}", "",
+             f"{len(cases)} cases ({counts}). Hit = a chunk from a gold section.", "",
              "| Method | Recall@5 | Recall@10 | MRR | " + " | ".join(f"R@5 {t}" for t in types) + " |",
              "|---|---|---|---|" + "---|" * len(types)]
     misses: dict[str, list[str]] = {}
@@ -71,7 +72,7 @@ def main() -> None:
 
     report = "\n".join(lines) + "\n"
     RESULTS.mkdir(exist_ok=True)
-    out = RESULTS / f"{date.today()}-{'-'.join(args.methods)}.md"
+    out = RESULTS / f"{today}-{'-'.join(args.methods)}.md"
     out.write_text(report)
     print(report)
     print(f"Saved to {out}")

@@ -52,3 +52,26 @@ Volume 1 result: 116 sections → 1,970 chunks (1,649 text, 321 definitions); te
 - "Why does a spinning skater speed up when she pulls her arms in?" → top 3 all from §11.3 Conservation of Angular Momentum ✅
 - "What is inertia?" → the §5.2 glossary definition first ✅
 - "Why do I lean back when the bus suddenly starts?" → §11.4 gyroscopes, §6.3 centripetal force ❌ (should be §5.2 inertia). Everyday wording vs. textbook wording: exactly the gap keyword search, HyDE, and reranking should close. It's the first case for the eval set.
+
+## Retrieval and the first ablation (T4)
+
+Three methods in `tutor/retrieve.py`, each adding one layer:
+- **vector**: cosine distance on the bge embeddings (exact scan).
+- **keyword**: Postgres full-text search on a generated `search_vector` column (GIN index). The question's words are OR-ed (`plainto_tsquery` ANDs them, so a natural question would match almost nothing) and ranked with `ts_rank_cd`. BM25-like, but with no collection-wide IDF.
+- **hybrid**: top 50 from each path, merged with **Reciprocal Rank Fusion** (score = Σ 1/(60 + rank)). It uses ranks because the two scores are on different scales.
+
+**Eval set** (`evals/retrieval_cases.jsonl`): 42 questions, 14 each of *textbook* wording, *everyday* wording, and exact *terms*, each with gold section(s). Hit = any retrieved chunk from a gold section. Drafted by Claude with gold sections checked against the chunks. Still to do: Xi's review and misconception-style cases.
+
+**First results (2026-10-06):**
+
+| Method | Recall@5 | Recall@10 | MRR | R@5 everyday | R@5 term | R@5 textbook |
+|---|---|---|---|---|---|---|
+| vector | 90% | 95% | 0.90 | 71% | 100% | 100% |
+| keyword | 81% | 86% | 0.57 | 57% | 100% | 86% |
+| hybrid | 93% | 93% | 0.89 | 86% | 100% | 93% |
+
+Reading it:
+- **Hybrid helps everyday questions** (71% → 86%): keyword matches like "siren"/"ambulance" and "skydiver" rescue cases the vectors missed.
+- **But it adds noise at the top:** MRR doesn't improve, and one textbook question (#3 "How is linear momentum defined?") drops out of the top 5 because keyword search ranks chapter introductions that repeat "momentum". That's the job a cross-encoder reranker is for.
+- **Still missed by everything:** the bus/inertia question (#15) and the guitar-beats question (#23). Both are everyday wording with no shared keywords, which is the case HyDE targets.
+- **Caveats:** 42 cases, so one case = 2.4 points. Term questions are at 100% for every method (too easy, a ceiling effect). The set needs harder cases before small differences mean anything.

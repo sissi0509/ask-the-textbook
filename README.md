@@ -31,6 +31,20 @@ uv run python -m tutor.ingest.embed_chunks    # ~25 s; downloads the model once
 uv run pytest                 # tests
 ```
 
+## Retrieval eval
+
+```bash
+uv run python evals/run_retrieval_eval.py   # Recall@5/@10 and MRR for vector, keyword, hybrid
+```
+
+| Method | Recall@5 | MRR | Recall@5 on everyday-wording questions |
+|---|---|---|---|
+| vector | 90% | 0.90 | 71% |
+| keyword | 81% | 0.57 | 57% |
+| hybrid (RRF) | **93%** | 0.89 | **86%** |
+
+42 cases; details and caveats in [docs/DESIGN.md](docs/DESIGN.md).
+
 ## Design
 
 - [docs/DESIGN.md](docs/DESIGN.md): decisions and why
