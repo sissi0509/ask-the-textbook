@@ -9,7 +9,9 @@ def hit(section_number, section_title, subsection, content):
 def test_label_with_and_without_subsection():
     assert label(hit("5.2", "Newton's First Law", "Gravitation and Inertia", "")) == \
         "Vol. 1 §5.2 Newton's First Law › Gravitation and Inertia"
-    assert label(hit(None, "Introduction", None, "")) == "Vol. 1 Introduction"
+    intro = hit(None, "Introduction", None, "")
+    intro.chapter_number = 5
+    assert label(intro) == "Vol. 1 Ch. 5 Introduction"
 
 
 def test_context_numbers_passages_from_one():
