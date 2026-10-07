@@ -1,0 +1,42 @@
+{"id": 1, "type": "textbook", "question": "What does Newton's second law state?", "gold": ["5.3"]}
+{"id": 2, "type": "textbook", "question": "What is the work-energy theorem?", "gold": ["7.3"]}
+{"id": 3, "type": "textbook", "question": "How is linear momentum defined?", "gold": ["9.1"]}
+{"id": 4, "type": "textbook", "question": "What is the difference between conservative and non-conservative forces?", "gold": ["8.2"]}
+{"id": 5, "type": "textbook", "question": "What are the conditions for static equilibrium?", "gold": ["12.1"]}
+{"id": 6, "type": "textbook", "question": "What is simple harmonic motion?", "gold": ["15.1"]}
+{"id": 7, "type": "textbook", "question": "How is torque defined?", "gold": ["10.6"]}
+{"id": 8, "type": "textbook", "question": "What are Kepler's laws of planetary motion?", "gold": ["13.5"]}
+{"id": 9, "type": "textbook", "question": "What is an elastic collision?", "gold": ["9.4"]}
+{"id": 10, "type": "textbook", "question": "What is the difference between average velocity and instantaneous velocity?", "gold": ["3.1", "3.2"]}
+{"id": 11, "type": "textbook", "question": "How do you add vectors using their components?", "gold": ["2.2", "2.3"]}
+{"id": 12, "type": "textbook", "question": "What is centripetal acceleration?", "gold": ["4.4", "6.3"]}
+{"id": 13, "type": "textbook", "question": "What determines the speed of a wave on a stretched string?", "gold": ["16.3"]}
+{"id": 14, "type": "textbook", "question": "What is a standing wave?", "gold": ["16.6", "17.4"]}
+{"id": 15, "type": "everyday", "question": "Why do I lean back when the bus suddenly starts?", "gold": ["5.2"]}
+{"id": 16, "type": "everyday", "question": "Why does a spinning ice skater speed up when she pulls her arms in?", "gold": ["11.3"]}
+{"id": 17, "type": "everyday", "question": "Why does a siren sound higher when the ambulance comes toward me and lower after it passes?", "gold": ["17.7"]}
+{"id": 18, "type": "everyday", "question": "Why does a huge ship made of steel float?", "gold": ["14.4"]}
+{"id": 19, "type": "everyday", "question": "Why does a gun kick back when it is fired?", "gold": ["9.3", "9.4"]}
+{"id": 20, "type": "everyday", "question": "Why is it easier to open a door when you push far from the hinges?", "gold": ["10.6"]}
+{"id": 21, "type": "everyday", "question": "Why do astronauts on the space station look weightless?", "gold": ["13.2", "13.4"]}
+{"id": 22, "type": "everyday", "question": "Why can a car slide off a curved road when the road is icy?", "gold": ["6.2", "6.3"]}
+{"id": 23, "type": "everyday", "question": "Why do two guitar strings that are slightly out of tune make a wobbling wah-wah sound?", "gold": ["17.6"]}
+{"id": 24, "type": "everyday", "question": "Why does a skydiver stop speeding up after falling for a while?", "gold": ["6.4"]}
+{"id": 25, "type": "everyday", "question": "Why does a grandfather clock with a swinging weight keep regular time?", "gold": ["15.4"]}
+{"id": 26, "type": "everyday", "question": "How can a rocket move forward in empty space with nothing to push against?", "gold": ["9.7"]}
+{"id": 27, "type": "everyday", "question": "Why does water come out faster when I put my thumb over the end of a garden hose?", "gold": ["14.5"]}
+{"id": 28, "type": "everyday", "question": "Why does the ocean rise and fall twice a day?", "gold": ["13.6"]}
+{"id": 29, "type": "term", "question": "Bernoulli's equation", "gold": ["14.6"]}
+{"id": 30, "type": "term", "question": "Pascal's principle", "gold": ["14.3"]}
+{"id": 31, "type": "term", "question": "Young's modulus", "gold": ["12.3"]}
+{"id": 32, "type": "term", "question": "moment of inertia of a thin rod", "gold": ["10.5"]}
+{"id": 33, "type": "term", "question": "Doppler effect formula", "gold": ["17.7"]}
+{"id": 34, "type": "term", "question": "escape velocity", "gold": ["13.3"]}
+{"id": 35, "type": "term", "question": "impulse-momentum theorem", "gold": ["9.2"]}
+{"id": 36, "type": "term", "question": "scalar product of two vectors", "gold": ["2.4"]}
+{"id": 37, "type": "term", "question": "terminal velocity", "gold": ["6.4"]}
+{"id": 38, "type": "term", "question": "parallel axis theorem", "gold": ["10.5"]}
+{"id": 39, "type": "term", "question": "significant figures", "gold": ["1.6"]}
+{"id": 40, "type": "term", "question": "Fermi estimate", "gold": ["1.5"]}
+{"id": 41, "type": "term", "question": "Reynolds number", "gold": ["14.7"]}
+{"id": 42, "type": "term", "question": "damped harmonic oscillator", "gold": ["15.5"]}
