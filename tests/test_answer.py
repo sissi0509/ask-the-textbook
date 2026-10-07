@@ -8,15 +8,15 @@ def hit(section_number, section_title, subsection, content):
 
 def test_label_with_and_without_subsection():
     assert label(hit("5.2", "Newton's First Law", "Gravitation and Inertia", "")) == \
-        "§5.2 Newton's First Law › Gravitation and Inertia"
-    assert label(hit(None, "Introduction", None, "")) == "Introduction"
+        "Vol. 1 §5.2 Newton's First Law › Gravitation and Inertia"
+    assert label(hit(None, "Introduction", None, "")) == "Vol. 1 Introduction"
 
 
 def test_context_numbers_passages_from_one():
     context = build_context([hit("5.2", "Newton's First Law", None, "A body at rest..."),
                              hit("6.2", "Friction", None, "Friction opposes...")])
-    assert context.startswith("[1] §5.2 Newton's First Law\nA body at rest...")
-    assert "\n\n[2] §6.2 Friction\nFriction opposes..." in context
+    assert context.startswith("[1] Vol. 1 §5.2 Newton's First Law\nA body at rest...")
+    assert "\n\n[2] Vol. 1 §6.2 Friction\nFriction opposes..." in context
 
 
 def test_citations_in_first_use_order_including_lists():

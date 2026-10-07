@@ -22,6 +22,10 @@ QUERY_INSTRUCTION = "Represent this sentence for searching relevant passages: "
 RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 RERANK_CANDIDATES = 30  # how many first-stage results the reranker re-sorts
 
+# Retrieval method used for answers. vector_rerank won on the 3-volume eval
+# (see docs/DESIGN.md "All three volumes"); hybrid_rerank won on Volume 1 alone.
+DEFAULT_METHOD = "vector_rerank"
+
 # Answer generation (T5)
 ANSWER_MODEL = "claude-opus-5-5"
 ANSWER_EFFORT = "medium"

@@ -87,9 +87,9 @@ def main() -> None:
             llm_section = (re.findall(r"\b\d{1,2}\.\d{1,2}\b", answer) or ["?"])[0]
             top = retrieve(conn, question, k=1, method="hybrid_rerank")[0]
             llm_right += llm_section == truth
-            rag_right += top.section_number == truth
+            rag_right += top.ref == f"1:{truth}"
             lines.append(f"| {question} | {truth} | {answer} {'✅' if llm_section == truth else '❌'} | "
-                         f"{top.section_number} {top.section_title} {'✅' if top.section_number == truth else '❌'} |")
+                         f"{top.section_number} {top.section_title} {'✅' if top.ref == f'1:{truth}' else '❌'} |")
         n = len(SECTION_QUESTIONS)
         lines += ["", f"**LLM from memory: {llm_right}/{n} · RAG: {rag_right}/{n}**", "",
                   "## 2. Verbatim continuation (memorization)", "",

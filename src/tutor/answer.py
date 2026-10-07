@@ -12,7 +12,7 @@ from dataclasses import dataclass
 import anthropic
 import psycopg
 
-from tutor.config import ANSWER_EFFORT, ANSWER_MODEL, ANSWER_PASSAGES, PRICES
+from tutor.config import ANSWER_EFFORT, ANSWER_MODEL, ANSWER_PASSAGES, DEFAULT_METHOD, PRICES
 from tutor.retrieve import Hit, retrieve
 
 SYSTEM = """You are a physics tutor. You explain ideas the way a great teacher does:
@@ -43,6 +43,7 @@ class Answer:
 
 def label(hit: Hit) -> str:
     section = f"§{hit.section_number} {hit.section_title}" if hit.section_number else hit.section_title
+    section = f"Vol. {hit.volume} {section}"
     return f"{section} › {hit.subsection_title}" if hit.subsection_title else section
 
 
@@ -59,7 +60,7 @@ def check_citations(text: str, n_passages: int) -> tuple[list[int], list[int]]:
 
 
 def stream_answer(conn: psycopg.Connection, question: str,
-                  method: str = "hybrid_rerank") -> Iterator[str | Answer]:
+                  method: str = DEFAULT_METHOD) -> Iterator[str | Answer]:
     """Yield the answer text piece by piece, then the finished Answer."""
     hits = retrieve(conn, question, k=ANSWER_PASSAGES, method=method)
     prompt = f"Textbook passages:\n\n{build_context(hits)}\n\nLearner's question: {question}"

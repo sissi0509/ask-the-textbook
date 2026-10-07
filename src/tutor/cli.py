@@ -7,6 +7,7 @@ Run:  uv run python -m tutor.cli "Why do I lean back when the bus starts?"
 import argparse
 
 from tutor.answer import Answer, label, stream_answer
+from tutor.config import DEFAULT_METHOD
 from tutor.db import connect
 from tutor.retrieve import METHODS
 
@@ -14,7 +15,7 @@ from tutor.retrieve import METHODS
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("question")
-    parser.add_argument("--method", default="hybrid_rerank", choices=list(METHODS))
+    parser.add_argument("--method", default=DEFAULT_METHOD, choices=list(METHODS))
     parser.add_argument("--passages", action="store_true", help="print the retrieved passages")
     args = parser.parse_args()
 

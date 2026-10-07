@@ -1,6 +1,7 @@
 """Measure retrieval quality on the eval set: Recall@5, Recall@10, MRR, by question type.
 
 A hit = any retrieved chunk whose section is one of the case's gold sections.
+Gold sections are volume-qualified ("1:5.2") because section numbers repeat across volumes.
 
 Run:  uv run python evals/run_retrieval_eval.py [--methods vector keyword hybrid]
 Writes a dated Markdown report to evals/results/.
@@ -22,7 +23,7 @@ DEPTH = 10  # retrieve this many, score Recall@5 and Recall@10 from it
 
 def first_hit_rank(hits, gold: set[str]) -> int | None:
     for rank, hit in enumerate(hits, start=1):
-        if hit.section_number in gold:
+        if hit.ref in gold:
             return rank
     return None
 
@@ -43,29 +44,34 @@ def main() -> None:
 
     cases = [json.loads(line) for line in CASES.read_text().splitlines() if line.strip()]
     types = sorted({c["type"] for c in cases})
+    volumes = sorted({int(c["gold"][0].split(":")[0]) for c in cases})  # a case's volume = its first gold section's
     today = datetime.now().astimezone().date()
     counts = ", ".join(f"{t}: {sum(c['type'] == t for c in cases)}" for t in types)
     lines = [f"# Retrieval eval, {today}", "",
              f"{len(cases)} cases ({counts}). Hit = a chunk from a gold section.", "",
-             "| Method | Recall@5 | Recall@10 | MRR | " + " | ".join(f"R@5 {t}" for t in types) + " |",
-             "|---|---|---|---|" + "---|" * len(types)]
+             "| Method | Recall@5 | Recall@10 | MRR | " + " | ".join(f"R@5 {t}" for t in types)
+             + " | " + " | ".join(f"R@5 vol {v}" for v in volumes) + " |",
+             "|---|---|---|---|" + "---|" * (len(types) + len(volumes))]
     misses: dict[str, list[str]] = {}
 
     with connect() as conn:
         for method in args.methods:
-            ranks, by_type = [], defaultdict(list)
+            ranks, by_type, by_volume = [], defaultdict(list), defaultdict(list)
             misses[method] = []
             for case in cases:
                 hits = retrieve(conn, case["question"], k=DEPTH, method=method)
                 rank = first_hit_rank(hits, set(case["gold"]))
                 ranks.append(rank)
                 by_type[case["type"]].append(rank)
+                by_volume[int(case["gold"][0].split(":")[0])].append(rank)
                 if rank is None or rank > 5:
-                    got = ", ".join(h.section_number or "intro" for h in hits[:3])
+                    got = ", ".join(h.ref if h.section_number else f"{h.volume}:intro" for h in hits[:3])
                     misses[method].append(f"- #{case['id']} {case['question']} (gold {'/'.join(case['gold'])}; got {got})")
             s = score(ranks)
             per_type = " | ".join(f"{score(by_type[t])['recall@5']:.0%}" for t in types)
-            lines.append(f"| {method} | {s['recall@5']:.0%} | {s['recall@10']:.0%} | {s['mrr']:.2f} | {per_type} |")
+            per_volume = " | ".join(f"{score(by_volume[v])['recall@5']:.0%}" for v in volumes)
+            lines.append(f"| {method} | {s['recall@5']:.0%} | {s['recall@10']:.0%} | {s['mrr']:.2f} "
+                         f"| {per_type} | {per_volume} |")
 
     for method, missed in misses.items():
         lines += ["", f"## Misses outside the top 5: {method} ({len(missed)})", *missed]

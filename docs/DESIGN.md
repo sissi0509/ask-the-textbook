@@ -115,3 +115,27 @@ The project started as "Learn Physics with Feynman", hoping to use *The Feynman 
 - *Redshift (complex case #43):* explained the Doppler part from §17.7 and said clearly that the passages "never use the word 'redshift'" and "say nothing about relativity", exactly the honest behavior the case's note asked for.
 
 **Eval correction found through T5:** the bus question's best passage was in **§6.3 Inertial Forces** (same example: pushed back into a jet seat), which the eval had counted as a miss. Gold is now §5.2 + §6.3. Re-run: hybrid + rerank **Recall@5 98%, Recall@10 100%, MRR 0.96**; the only miss left is #23 (guitar beats). Lesson: retrieval "misses" need reading before they're trusted, because gold labels can be too narrow.
+
+## All three volumes
+
+Loaded Volumes 2 (thermodynamics, E&M) and 3 (optics, modern physics). The parser and chunker needed no changes (same structure). **Corpus: 314 sections, 5,293 chunks** (1,970 + 1,749 + 1,574), embedded in 42 s.
+
+- **Section numbers repeat across volumes** (each volume has a §5.2), so citations now say "Vol. 1 §5.2", and eval gold labels are volume-qualified (`"1:5.2"`). `Hit.ref` gives `"volume:section"`.
+- **Eval grew to 55 cases:** +12 for Volumes 2–3 (static charge, refrigerators, Faraday, refraction, rainbows, photoelectric effect, time dilation, the expanding universe, …). The redshift case's gold now spans 1:17.7, 3:5.7, 3:11.6.
+
+**Results on the 3× corpus:**
+
+| Method | Recall@5 | MRR | R@5 everyday | R@5 vol 1 | R@5 vol 2 | R@5 vol 3 |
+|---|---|---|---|---|---|---|
+| vector | 95% | 0.90 | 85% | 93% | 100% | 100% |
+| keyword | 73% | 0.52 | 55% | 72% | 67% | 83% |
+| hybrid | 91% | 0.82 | 85% | 91% | 83% | 100% |
+| **vector + rerank** | **98%** | **0.94** | **95%** | **98%** | 100% | 100% |
+| hybrid + rerank | 95% | 0.93 | 85% | 93% | 100% | 100% |
+
+**What changed with a bigger corpus:**
+- **The keyword path got noisier.** Common words now collide across topics: "gun **kick back**" matches Vol. 2's "**back** emf"; "bus **starts**" pulls in electric-motor sections. Those collisions take slots in the RRF top 30, so the reranker never sees some good vector candidates. Hybrid + rerank dropped from 98% (Vol. 1 corpus) to 93% on the same Vol. 1 questions.
+- **vector + rerank held up** (98%), so it's now the default for answers (`DEFAULT_METHOD`). The keyword path still matters for exact terms, so it isn't removed. A better fusion (e.g. reranking the *union* of vector top 30 + keyword top 10 instead of the RRF top 30) is a candidate fix.
+- Caveat: 55 cases, so 1 case ≈ 2 points; the vol 2/3 columns have only 6 cases each.
+
+**Redshift, now with Volume 3:** the answer found the cosmology glossary (Vol. 3 §11.6: redshift "due to cosmological expansion") next to the Doppler passages and contrasted the two pictures. It still missed Vol. 3 §5.7 (Doppler Effect for Light) and said plainly that the passages don't reconcile them. Comparison questions need passages about *both* sides; that's the case for **query decomposition** (split the question, retrieve per part).
