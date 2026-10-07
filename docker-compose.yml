@@ -1,3 +1,5 @@
+name: ask-the-textbook
+
 # Local Postgres with the pgvector extension preinstalled.
 #   Start:  docker compose up -d
 #   Stop:   docker compose down

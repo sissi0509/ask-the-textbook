@@ -23,7 +23,7 @@ All searchable text lives in `chunks` with a `chunk_type` column, so one hybrid 
 
 ## v1 chunking rules (T2)
 
-v1 keeps only what the Feynman Lectures also have (long prose), so a future switch to that text needs a new parser, not a new pipeline.
+v1 keeps only prose (paragraphs + definitions). Worked examples and figures can be added later as new chunk types without changing the pipeline.
 
 - **Paragraph = chunk** (`text`). A display equation or a bullet list joins the paragraph before it. So does a paragraph that continues a derivation (starts lowercase or has under 8 words, e.g. "so v_T = mg/b.").
 - **Math** is converted from MathML to readable text (`F⃗_net = 0⃗`).
@@ -96,3 +96,7 @@ Reading it:
 - **Cost:** about +0.55 s per question on a laptop CPU, which is fine for a tutor. It's the price of running a model 30 times per question.
 - **Still missed:** #15 (bus → inertia) and #23 (out-of-tune strings → beats). The reranker found nearby physics (friction, centripetal force, musical sound) but not the exact concept. Both are pure wording mismatches, the case HyDE is designed for.
 - vector + rerank ≈ hybrid + rerank on Recall@5 here; hybrid + rerank wins Recall@10 (98%). With 42 cases these differences are 1 question; we'll keep hybrid + rerank as the default because the keyword path protects exact-term questions on a larger, harder set.
+
+## Name and source (2026-10-07)
+
+The project started as "Learn Physics with Feynman", hoping to use *The Feynman Lectures on Physics*. Permission was requested from the publisher; the editor of the New Millennium Edition replied that the rights don't allow AI use and the online edition is read-only. The project was renamed **Ask the Textbook** and is built only on OpenStax. The explanation style (intuition first, everyday examples) comes from the prompt, not from any copyrighted text.
