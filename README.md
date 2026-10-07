@@ -18,8 +18,17 @@ Requirements: [uv](https://docs.astral.sh/uv/), Docker Desktop.
 cp .env.example .env          # add your ANTHROPIC_API_KEY
 docker compose up -d          # Postgres + pgvector on localhost:5432
 uv sync                       # Python dependencies
+
+# Download the textbook source (text only, ~19 MB; images skipped)
+git clone --depth 1 --filter=blob:none --sparse \
+  https://github.com/openstax/osbooks-university-physics-bundle.git data/openstax-physics
+git -C data/openstax-physics sparse-checkout set META-INF collections modules
 uv run pytest                 # tests
 ```
+
+## Design
+
+See [docs/DESIGN.md](docs/DESIGN.md).
 
 ## License
 
