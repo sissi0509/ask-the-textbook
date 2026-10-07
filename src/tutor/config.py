@@ -17,3 +17,7 @@ EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 EMBEDDING_DIM = 384
 # bge models expect this prefix on search queries (not on the passages).
 QUERY_INSTRUCTION = "Represent this sentence for searching relevant passages: "
+
+# Reranker: a cross-encoder reads (question, passage) together and scores the pair.
+RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+RERANK_CANDIDATES = 30  # how many first-stage results the reranker re-sorts

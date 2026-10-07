@@ -23,7 +23,7 @@ All searchable text lives in `chunks` with a `chunk_type` column, so one hybrid 
 
 ## v1 chunking rules (T2)
 
-v1 keeps only what the Feynman Lectures also have (long prose), so a future switch to that text needs a new parser, not a new pipeline.
+v1 keeps only prose (paragraphs + definitions). Worked examples and figures can be added later as new chunk types without changing the pipeline.
 
 - **Paragraph = chunk** (`text`). A display equation or a bullet list joins the paragraph before it. So does a paragraph that continues a derivation (starts lowercase or has under 8 words, e.g. "so v_T = mg/b.").
 - **Math** is converted from MathML to readable text (`F⃗_net = 0⃗`).
@@ -75,3 +75,28 @@ Reading it:
 - **But it adds noise at the top:** MRR doesn't improve, and one textbook question (#3 "How is linear momentum defined?") drops out of the top 5 because keyword search ranks chapter introductions that repeat "momentum". That's the job a cross-encoder reranker is for.
 - **Still missed by everything:** the bus/inertia question (#15) and the guitar-beats question (#23). Both are everyday wording with no shared keywords, which is the case HyDE targets.
 - **Caveats:** 42 cases, so one case = 2.4 points. Term questions are at 100% for every method (too easy, a ceiling effect). The set needs harder cases before small differences mean anything.
+
+## Reranking (second stage)
+
+Before building it, we checked the reranker's **ceiling**: a reranker can only re-sort candidates it's given. Hybrid's **Recall@20 was 100%**: every gold section was in the top 20, and the three misses sat at ranks 15, 16, and 20. So a reranker over the top 30 could, in principle, fix all of them.
+
+- **Model:** `cross-encoder/ms-marco-MiniLM-L-6-v2` (small, local). It reads *question + passage together* and outputs one relevance score.
+- **Input:** `section title › subsection` + the chunk text, for the top **30** first-stage candidates.
+
+| Method | Recall@5 | Recall@10 | MRR | R@5 everyday | R@5 term | R@5 textbook | Latency (median) |
+|---|---|---|---|---|---|---|---|
+| vector | 90% | 95% | 0.90 | 71% | 100% | 100% | 31 ms |
+| keyword | 81% | 86% | 0.57 | 57% | 100% | 86% | |
+| hybrid | 93% | 93% | 0.89 | 86% | 100% | 93% | 27 ms |
+| vector + rerank | 95% | 95% | 0.95 | 86% | 100% | 100% | |
+| **hybrid + rerank** | **95%** | **98%** | **0.95** | 86% | 100% | **100%** | 576 ms |
+
+Reading it:
+- **The reranker did its job, cleaning the top of the list:** MRR 0.89 → 0.95, and the textbook question that keyword noise had pushed down (#3, linear momentum) is back in the top 5.
+- **Cost:** about +0.55 s per question on a laptop CPU, which is fine for a tutor. It's the price of running a model 30 times per question.
+- **Still missed:** #15 (bus → inertia) and #23 (out-of-tune strings → beats). The reranker found nearby physics (friction, centripetal force, musical sound) but not the exact concept. Both are pure wording mismatches, the case HyDE is designed for.
+- vector + rerank ≈ hybrid + rerank on Recall@5 here; hybrid + rerank wins Recall@10 (98%). With 42 cases these differences are 1 question; we'll keep hybrid + rerank as the default because the keyword path protects exact-term questions on a larger, harder set.
+
+## Name and source (2026-10-07)
+
+The project started as "Learn Physics with Feynman", hoping to use *The Feynman Lectures on Physics*. Permission was requested from the publisher; the editor of the New Millennium Edition replied that the rights don't allow AI use and the online edition is read-only. The project was renamed **Ask the Textbook** and is built only on OpenStax. The explanation style (intuition first, everyday examples) comes from the prompt, not from any copyrighted text.

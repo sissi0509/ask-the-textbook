@@ -16,7 +16,12 @@ def get_model():
     # Imported here so modules that only need passage_text() stay fast to load.
     from sentence_transformers import SentenceTransformer
 
-    return SentenceTransformer(EMBEDDING_MODEL)
+    # Use the cached copy without asking the Hugging Face Hub (a slow network
+    # check that can take minutes); download only the first time.
+    try:
+        return SentenceTransformer(EMBEDDING_MODEL, local_files_only=True)
+    except OSError:
+        return SentenceTransformer(EMBEDDING_MODEL)
 
 
 def passage_text(

@@ -1,7 +1,7 @@
 [project]
-name = "learn-physics-with-feynman"
+name = "ask-the-textbook"
 version = "0.1.0"
-description = "Ask physics questions, get Feynman-style explanations grounded in an open textbook (RAG)."
+description = "A grounded physics tutor: answers explained simply and cited from an open textbook (hybrid RAG)."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
