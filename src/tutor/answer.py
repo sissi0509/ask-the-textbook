@@ -53,7 +53,9 @@ class Answer:
 
 
 def label(hit: Hit) -> str:
-    section = f"§{hit.section_number} {hit.section_title}" if hit.section_number else hit.section_title
+    # Every chapter has an "Introduction", so name the chapter for those.
+    section = (f"§{hit.section_number} {hit.section_title}" if hit.section_number
+               else f"Ch. {hit.chapter_number} {hit.section_title}")
     section = f"Vol. {hit.volume} {section}"
     return f"{section} › {hit.subsection_title}" if hit.subsection_title else section
 

@@ -24,6 +24,21 @@ export default function Home() {
     bottom.current?.scrollIntoView({ behavior: "smooth" });
   }, [turns]);
 
+  // Shareable links: /?q=your+question&compare=1 asks immediately.
+  const asked = useRef(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q");
+    if (q && !asked.current) {
+      asked.current = true;
+      const withCompare = params.get("compare") === "1";
+      setCompare(withCompare);
+      ask(q, withCompare);
+    }
+    // ask() is stable enough here: this runs once, on the first render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Update one answer of the latest turn without touching the rest of the chat.
   function updateAnswer(index: number, change: (a: AnswerState) => AnswerState) {
     setTurns((prev) => {
@@ -33,12 +48,12 @@ export default function Home() {
     });
   }
 
-  async function ask(question: string) {
+  async function ask(question: string, withCompare: boolean = compare) {
     const q = question.trim();
     if (!q || busy) return;
     setInput("");
     setBusy(true);
-    const kinds: AnswerState["kind"][] = compare ? ["textbook", "memory"] : ["textbook"];
+    const kinds: AnswerState["kind"][] = withCompare ? ["textbook", "memory"] : ["textbook"];
     setTurns((prev) => [...prev, { question: q, answers: kinds.map((kind) => ({ kind, text: "" })) }]);
 
     // Each question is answered on its own; earlier turns aren't sent to the model.

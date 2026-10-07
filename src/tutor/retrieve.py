@@ -24,8 +24,8 @@ COLUMNS = """
     c.id, c.section_id, s.section_number, s.section_title,
     c.subsection_title, c.chunk_type, c.content
 """
-# score comes next in every SELECT; volume is selected last
-VOLUME = ", s.volume"
+# score comes next in every SELECT; volume and chapter are selected last
+VOLUME = ", s.volume, s.chapter_number"
 
 
 @dataclass
@@ -39,6 +39,7 @@ class Hit:
     content: str
     score: float
     volume: int = 1
+    chapter_number: int = 0
 
     @property
     def ref(self) -> str:
