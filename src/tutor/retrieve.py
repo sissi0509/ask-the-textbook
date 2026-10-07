@@ -24,6 +24,8 @@ COLUMNS = """
     c.id, c.section_id, s.section_number, s.section_title,
     c.subsection_title, c.chunk_type, c.content
 """
+# score comes next in every SELECT; volume is selected last
+VOLUME = ", s.volume"
 
 
 @dataclass
@@ -36,12 +38,18 @@ class Hit:
     chunk_type: str
     content: str
     score: float
+    volume: int = 1
+
+    @property
+    def ref(self) -> str:
+        """Volume-qualified section, e.g. '1:5.2'. Section numbers repeat across volumes."""
+        return f"{self.volume}:{self.section_number}"
 
 
 def vector_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]:
     register_vector(conn)
     rows = conn.execute(
-        f"""SELECT {COLUMNS}, 1 - (c.embedding <=> %(q)s) AS score
+        f"""SELECT {COLUMNS}, 1 - (c.embedding <=> %(q)s) AS score{VOLUME}
             FROM chunks c JOIN sections s ON s.id = c.section_id
             ORDER BY c.embedding <=> %(q)s
             LIMIT %(k)s""",
@@ -58,7 +66,7 @@ def keyword_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]
         f"""WITH q AS (
                 SELECT replace(plainto_tsquery('english', %(q)s)::text, '&', '|')::tsquery AS query
             )
-            SELECT {COLUMNS}, ts_rank_cd(c.search_vector, q.query) AS score
+            SELECT {COLUMNS}, ts_rank_cd(c.search_vector, q.query) AS score{VOLUME}
             FROM chunks c JOIN sections s ON s.id = c.section_id, q
             WHERE c.search_vector @@ q.query
             ORDER BY score DESC

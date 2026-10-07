@@ -4,7 +4,7 @@
 
 Under the hood it's a retrieval-augmented generation (RAG) system: a two-stage hybrid retriever (Postgres full-text search + pgvector, merged with reciprocal rank fusion, then a cross-encoder reranker) feeding Claude. Every layer is measured against an evaluation set, and answers are checked for staying faithful to their sources.
 
-> Physics content comes from [OpenStax *University Physics*](https://openstax.org/details/books/university-physics-volume-1) (CC BY-NC-SA 4.0). It's downloaded locally during setup and never stored in this repo.
+> Physics content comes from [OpenStax *University Physics*](https://openstax.org/details/books/university-physics-volume-1), Volumes 1–3 (CC BY-NC-SA 4.0). It's downloaded locally during setup and never stored in this repo.
 
 ## Status
 
@@ -28,10 +28,12 @@ git clone --depth 1 --filter=blob:none --sparse \
   https://github.com/openstax/osbooks-university-physics-bundle.git data/openstax-physics
 git -C data/openstax-physics sparse-checkout set META-INF collections modules
 
-# Build the database (Volume 1): structure -> chunks -> embeddings
-uv run python -m tutor.ingest.load_sections
-uv run python -m tutor.ingest.load_chunks
-uv run python -m tutor.ingest.embed_chunks    # ~25 s; downloads the model once
+# Build the database (all three volumes): structure -> chunks -> embeddings
+for v in 1 2 3; do
+  uv run python -m tutor.ingest.load_sections --volume $v
+  uv run python -m tutor.ingest.load_chunks --volume $v
+done
+uv run python -m tutor.ingest.embed_chunks    # ~70 s for 5,293 chunks; downloads the model once
 uv run pytest                 # tests
 ```
 
@@ -43,12 +45,13 @@ uv run python evals/run_retrieval_eval.py   # Recall@5/@10 and MRR for every ret
 
 | Method | Recall@5 | MRR | Recall@5 on everyday-wording questions |
 |---|---|---|---|
-| vector | 93% | 0.91 | 79% |
-| keyword | 81% | 0.55 | 57% |
-| hybrid (RRF) | 95% | 0.90 | 93% |
-| **hybrid + cross-encoder rerank** | **98%** | **0.96** | 93% |
+| vector | 95% | 0.90 | 85% |
+| keyword | 73% | 0.52 | 55% |
+| hybrid (RRF) | 91% | 0.82 | 85% |
+| **vector + cross-encoder rerank** (default) | **98%** | **0.94** | **95%** |
+| hybrid + cross-encoder rerank | 95% | 0.93 | 85% |
 
-43 cases; details and caveats in [docs/DESIGN.md](docs/DESIGN.md).
+55 cases over all three volumes (5,293 chunks); details and caveats in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Design
 
