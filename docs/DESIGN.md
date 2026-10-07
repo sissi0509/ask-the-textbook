@@ -100,3 +100,18 @@ Reading it:
 ## Name and source (2026-10-07)
 
 The project started as "Learn Physics with Feynman", hoping to use *The Feynman Lectures on Physics*. Permission was requested from the publisher; the editor of the New Millennium Edition replied that the rights don't allow AI use and the online edition is read-only. The project was renamed **Ask the Textbook** and is built only on OpenStax. The explanation style (intuition first, everyday examples) comes from the prompt, not from any copyrighted text.
+
+## Answer generation (T5): v1 end to end
+
+`uv run python -m tutor.cli "question"` → hybrid + rerank top 5 → Claude (`claude-opus-5-5`, effort `medium`) → streamed answer + sources + token cost (~$0.02 per question).
+
+- **Style from the prompt:** intuition first, an everyday example, plain words before terms, then the precise statement; ~150–250 words; ends with a check-yourself question. No persona, no "Feynman".
+- **Grounding rules:** physics facts only from the numbered passages; cite `[n]`; say plainly what the passages don't cover; never invent quotes.
+- **Code owns the citations:** the model writes `[3]`; code maps it to `§6.3 Centripetal Force › Inertial Forces…` from the database and flags any number that wasn't a passage.
+- **Thinking counts toward `max_tokens`:** set to 16,000 so it never cuts off the visible answer (learned in the contamination probe).
+
+**First two answers:**
+- *Bus question:* explained with a tablecloth analogy, quoted §6.3 word for word ("a physicist would say that you tend to remain stationary while the seat pushes forward on you"), and **named a gap** it couldn't fill from the passages.
+- *Redshift (complex case #43):* explained the Doppler part from §17.7 and said clearly that the passages "never use the word 'redshift'" and "say nothing about relativity", exactly the honest behavior the case's note asked for.
+
+**Eval correction found through T5:** the bus question's best passage was in **§6.3 Inertial Forces** (same example: pushed back into a jet seat), which the eval had counted as a miss. Gold is now §5.2 + §6.3. Re-run: hybrid + rerank **Recall@5 98%, Recall@10 100%, MRR 0.96**; the only miss left is #23 (guitar beats). Lesson: retrieval "misses" need reading before they're trusted, because gold labels can be too narrow.

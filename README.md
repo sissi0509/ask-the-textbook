@@ -8,7 +8,11 @@ Under the hood it's a retrieval-augmented generation (RAG) system: a two-stage h
 
 ## Status
 
-🚧 v1 in progress: retrieval is built and measured (below); next is answer generation with citations.
+✅ **v1 works end to end:** ask a question in the terminal, get a cited explanation.
+
+```bash
+uv run python -m tutor.cli "Why do I lean back when the bus suddenly starts?"
+```
 
 ## Setup
 
@@ -39,12 +43,12 @@ uv run python evals/run_retrieval_eval.py   # Recall@5/@10 and MRR for every ret
 
 | Method | Recall@5 | MRR | Recall@5 on everyday-wording questions |
 |---|---|---|---|
-| vector | 90% | 0.90 | 71% |
-| keyword | 81% | 0.57 | 57% |
-| hybrid (RRF) | 93% | 0.89 | 86% |
-| **hybrid + cross-encoder rerank** | **95%** | **0.95** | 86% |
+| vector | 93% | 0.91 | 79% |
+| keyword | 81% | 0.55 | 57% |
+| hybrid (RRF) | 95% | 0.90 | 93% |
+| **hybrid + cross-encoder rerank** | **98%** | **0.96** | 93% |
 
-42 cases; details and caveats in [docs/DESIGN.md](docs/DESIGN.md).
+43 cases; details and caveats in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Design
 
