@@ -35,4 +35,20 @@ v1 keeps only what the Feynman Lectures also have (long prose), so a future swit
 
 Volume 1 result: 116 sections → 1,970 chunks (1,649 text, 321 definitions); text chunks have a median of 68 words. 99 summaries (introductions have none).
 
-**Known limitation:** a few chunks are long (max ~900 words, mostly long bullet lists). The embedding model reads at most 512 tokens, so their endings get cut off when embedded. Splitting long chunks is a candidate fix if the eval shows it matters.
+**Known limitation:** a few chunks are long (max ~900 words, mostly long bullet lists). Measured with the model's tokenizer in T3: **3 of 1,970 chunks** exceed the 512-token limit, so their endings are cut off when embedded.
+
+**Future option, from review: natural blocks vs. strategy chunks.** Split the current table in two: `blocks` (the book's natural paragraphs, fixed) and `chunks` (built from blocks by a chunking strategy, with a `strategy` column; long blocks split, small ones merged). That would let several strategies sit side by side for the chunking ablation. Not needed yet: re-parsing takes seconds and re-embedding about 25 s, so strategies can be compared one after another.
+
+## Embeddings (T3)
+
+- **Model:** `BAAI/bge-small-en-v1.5`, local and free, 384 dimensions, reads up to 512 tokens. It's a **bi-encoder**: passages and questions are embedded separately, so each chunk's vector is computed once at ingest.
+- **What gets embedded:** the heading path + the chunk, e.g. `Ch 5 Newton's Laws of Motion › 5.2 Newton's First Law › Gravitation and Inertia` + the paragraph, so short paragraphs carry their context. The stored `content` stays clean for the LLM.
+- **Queries** get the model's retrieval prefix (`Represent this sentence for searching relevant passages: `); passages don't.
+- **Vectors are normalized** (length 1), so cosine similarity is just a dot product.
+- **No vector index yet:** at ~2,000 rows an exact scan is fast and always correct (no approximate-index recall loss, no over-filtering).
+- **Speed:** all of Volume 1 embeds in **~24 s** on a laptop CPU (~80 chunks/s).
+
+**First retrieval smoke test (vector only):**
+- "Why does a spinning skater speed up when she pulls her arms in?" → top 3 all from §11.3 Conservation of Angular Momentum ✅
+- "What is inertia?" → the §5.2 glossary definition first ✅
+- "Why do I lean back when the bus suddenly starts?" → §11.4 gyroscopes, §6.3 centripetal force ❌ (should be §5.2 inertia). Everyday wording vs. textbook wording: exactly the gap keyword search, HyDE, and reranking should close. It's the first case for the eval set.

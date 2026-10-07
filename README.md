@@ -23,6 +23,11 @@ uv sync                       # Python dependencies
 git clone --depth 1 --filter=blob:none --sparse \
   https://github.com/openstax/osbooks-university-physics-bundle.git data/openstax-physics
 git -C data/openstax-physics sparse-checkout set META-INF collections modules
+
+# Build the database (Volume 1): structure -> chunks -> embeddings
+uv run python -m tutor.ingest.load_sections
+uv run python -m tutor.ingest.load_chunks
+uv run python -m tutor.ingest.embed_chunks    # ~25 s; downloads the model once
 uv run pytest                 # tests
 ```
 
