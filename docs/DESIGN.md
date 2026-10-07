@@ -19,6 +19,20 @@ Also: T1 can fill `sections` before any chunking exists; eval gold labels point 
 
 ## One `chunks` table for all chunk types
 
-Text, worked examples, definitions, and summaries all live in `chunks` with a `chunk_type` column, so one hybrid query (vector + full-text + RRF) searches everything, and `WHERE chunk_type = ...` filters by type. Equations stay inline in their paragraph's text.
+All searchable text lives in `chunks` with a `chunk_type` column, so one hybrid query (vector + full-text + RRF) searches everything, and `WHERE chunk_type = ...` filters by type. Full column reference: [SCHEMA.md](SCHEMA.md).
 
-Not searchable in v1: check-your-understanding notes, conceptual questions, problems (saved aside as eval material), interactive media links. Figures: caption text only; image-to-text descriptions are a later feature.
+## v1 chunking rules (T2)
+
+v1 keeps only what the Feynman Lectures also have (long prose), so a future switch to that text needs a new parser, not a new pipeline.
+
+- **Paragraph = chunk** (`text`). A display equation or a bullet list joins the paragraph before it. So does a paragraph that continues a derivation (starts lowercase or has under 8 words, e.g. "so v_T = mg/b.").
+- **Math** is converted from MathML to readable text (`F⃗_net = 0⃗`).
+- **Key-idea and problem-solving boxes** → `text`, title included ("Newton's First Law of Motion: A body at rest…").
+- **Glossary** → `definition` chunks ("inertia: ability of an object to resist changes in its motion").
+- **Subsection titles** → a `subsection_title` column on each chunk, not a separate table: nothing uses subsections on their own.
+- **Summary** → `sections.summary` (one per section). Planned v2 ablation: search summaries first to find the section, then its chunks (hierarchical retrieval).
+- **Skipped in v1:** worked examples, figures, tables, check-your-understanding, simulations, conceptual questions, problems, key-equation lists.
+
+Volume 1 result: 116 sections → 1,970 chunks (1,649 text, 321 definitions); text chunks have a median of 68 words. 99 summaries (introductions have none).
+
+**Known limitation:** a few chunks are long (max ~900 words, mostly long bullet lists). The embedding model reads at most 512 tokens, so their endings get cut off when embedded. Splitting long chunks is a candidate fix if the eval shows it matters.

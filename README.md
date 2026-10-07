@@ -28,7 +28,8 @@ uv run pytest                 # tests
 
 ## Design
 
-See [docs/DESIGN.md](docs/DESIGN.md).
+- [docs/DESIGN.md](docs/DESIGN.md): decisions and why
+- [docs/SCHEMA.md](docs/SCHEMA.md): the tables, with a diagram
 
 ## License
 
