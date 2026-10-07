@@ -22,3 +22,23 @@ def test_rrf_keeps_chunks_found_by_only_one_list():
 def test_rrf_respects_k():
     merged = rrf_merge([[hit(i) for i in range(10)]], k=3)
     assert len(merged) == 3
+
+
+def test_rerank_reorders_by_cross_encoder_score(monkeypatch):
+    import tutor.retrieve as retrieve_module
+
+    # Fake cross-encoder: the passage mentioning "inertia" is most relevant.
+    monkeypatch.setattr(
+        retrieve_module, "rerank_scores",
+        lambda question, passages: [1.0 if "inertia" in p else 0.0 for p in passages],
+    )
+    candidates = [hit(1), hit(2), Hit(3, "m1", "5.2", "Newton's First Law", None, "text",
+                                     "inertia resists changes in motion", 0.0)]
+    result = retrieve_module.rerank("Why do I lean back?", candidates, k=2)
+    assert [h.chunk_id for h in result] == [3, 1]
+
+
+def test_rerank_with_no_candidates():
+    from tutor.retrieve import rerank
+
+    assert rerank("anything", [], k=5) == []

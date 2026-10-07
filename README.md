@@ -34,14 +34,15 @@ uv run pytest                 # tests
 ## Retrieval eval
 
 ```bash
-uv run python evals/run_retrieval_eval.py   # Recall@5/@10 and MRR for vector, keyword, hybrid
+uv run python evals/run_retrieval_eval.py   # Recall@5/@10 and MRR for every retrieval method
 ```
 
 | Method | Recall@5 | MRR | Recall@5 on everyday-wording questions |
 |---|---|---|---|
 | vector | 90% | 0.90 | 71% |
 | keyword | 81% | 0.57 | 57% |
-| hybrid (RRF) | **93%** | 0.89 | **86%** |
+| hybrid (RRF) | 93% | 0.89 | 86% |
+| **hybrid + cross-encoder rerank** | **95%** | **0.95** | 86% |
 
 42 cases; details and caveats in [docs/DESIGN.md](docs/DESIGN.md).
 
