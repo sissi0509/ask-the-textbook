@@ -1,7 +1,34 @@
-<document xmlns="http://cnx.rice.edu/cnxml">
+<document xmlns="http://cnx.rice.edu/cnxml" xmlns:m="http://www.w3.org/1998/Math/MathML">
 <title>Newton's First Law</title>
 <metadata xmlns:md="http://cnx.rice.edu/mdml">
   <md:title>Newton's First Law</md:title>
+  <md:abstract><para>Learning objectives should not become chunks.</para></md:abstract>
 </metadata>
-<content><para>Body of Newton's First Law.</para></content>
+<content>
+  <para>Experience suggests that an object at rest remains at rest if left alone <link target-id="fig1"/>.</para>
+  <note><title>Newton's First Law of Motion</title><para>A body at rest remains at rest unless acted on by a net external force.</para></note>
+  <figure id="fig1"><media alt="a puck"/><caption>A hockey puck at rest.</caption></figure>
+  <section>
+    <title>Newton's First Law and Equilibrium</title>
+    <para>We can give Newton's first law in vector form for any object we study:</para>
+    <note class="equation-callout"><equation><m:math><m:mrow><m:msub><m:mi>F</m:mi><m:mtext>net</m:mtext></m:msub><m:mo>=</m:mo><m:mn>0</m:mn></m:mrow></m:math></equation></note>
+    <para>so the velocity is constant.</para>
+    <para>The forces that act on a parked car must balance, as listed below in this short list:</para>
+    <list><item>weight</item><item>the normal force</item></list>
+    <example><para>Does the first law apply to your car?</para></example>
+    <note class="check-understanding"><exercise><problem><para>A skydiver opens a parachute.</para></problem></exercise></note>
+    <note class="media-2"><para>Try the simulation.</para></note>
+  </section>
+  <section class="key-concepts">
+    <title>Summary</title>
+    <list><item>A net force is needed to change motion.</item><item>Inertia resists changes in motion.</item></list>
+  </section>
+  <section class="review-conceptual-questions">
+    <title>Conceptual Questions</title>
+    <exercise><problem><para>Why does a cupcake box slide?</para></problem></exercise>
+  </section>
+</content>
+<glossary>
+  <definition><term>inertia</term><meaning>ability of an object to resist changes in its motion</meaning></definition>
+</glossary>
 </document>
