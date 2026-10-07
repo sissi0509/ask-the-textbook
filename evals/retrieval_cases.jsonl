@@ -40,3 +40,4 @@
 {"id": 40, "type": "term", "question": "Fermi estimate", "gold": ["1.5"]}
 {"id": 41, "type": "term", "question": "Reynolds number", "gold": ["14.7"]}
 {"id": 42, "type": "term", "question": "damped harmonic oscillator", "gold": ["15.5"]}
+{"id": 43, "type": "complex", "question": "What is the origin of redshift: the Doppler effect or relativity? Which one is the real explanation?", "gold": ["17.7"], "note": "Comparison + partly out of scope. Vol 1 only covers the Doppler effect for sound (17.7); relativistic Doppler and cosmological redshift are in Vol 3, gravitational redshift is beyond the book. In T5, the answer should use 17.7 and say clearly that the relativity/cosmology parts are not in the loaded book."}

@@ -16,7 +16,12 @@ from tutor.config import RERANK_MODEL
 def get_model():
     from sentence_transformers import CrossEncoder
 
-    return CrossEncoder(RERANK_MODEL)
+    # Use the cached copy without asking the Hugging Face Hub (a slow network
+    # check that can take minutes); download only the first time.
+    try:
+        return CrossEncoder(RERANK_MODEL, local_files_only=True)
+    except OSError:
+        return CrossEncoder(RERANK_MODEL)
 
 
 def rerank_scores(question: str, passages: list[str]) -> list[float]:
