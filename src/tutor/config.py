@@ -32,3 +32,6 @@ ANSWER_EFFORT = "medium"
 ANSWER_PASSAGES = 5
 # $ per million tokens (input, output) for the cost line printed after each answer
 PRICES = {"claude-opus-5-5": (4.00, 20.00), "claude-sonnet-5-5": (2.00, 10.00), "claude-haiku-4-5": (1.00, 5.00)}
+
+# Web API: which browser origins may call it (the Next.js dev server runs on 3100)
+FRONTEND_ORIGINS = os.environ.get("FRONTEND_ORIGINS", "http://localhost:3100").split(",")

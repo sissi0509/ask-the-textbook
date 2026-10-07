@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Answers arrive as Markdown (bold, lists, headings). Tailwind resets those styles. */
+.answer-markdown {
+  line-height: 1.65;
+  font-size: 0.95rem;
+}
+.answer-markdown p,
+.answer-markdown ul,
+.answer-markdown ol {
+  margin: 0 0 0.75rem;
+}
+.answer-markdown ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.answer-markdown ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.answer-markdown h1,
+.answer-markdown h2,
+.answer-markdown h3 {
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+}
+.answer-markdown strong {
+  font-weight: 600;
+}
+.answer-markdown > :last-child {
+  margin-bottom: 0;
+}

@@ -8,11 +8,20 @@ Under the hood it's a retrieval-augmented generation (RAG) system: a two-stage h
 
 ## Status
 
-✅ **v1 works end to end:** ask a question in the terminal, get a cited explanation.
+✅ **v1 works end to end:** ask in the browser or the terminal, get a cited explanation.
 
 ```bash
+# Backend (FastAPI): http://localhost:8000
+uv run uvicorn tutor.api:app --reload --port 8000
+
+# Frontend (Next.js): http://localhost:3100
+cd web && cp .env.example .env.local && npm install && npm run dev
+
+# Or the terminal
 uv run python -m tutor.cli "Why do I lean back when the bus suddenly starts?"
 ```
+
+The chat page streams answers, lists the cited sections, shows the retrieved passages on request, and can put a **memory-only answer** (no retrieval) next to the grounded one for comparison.
 
 ## Setup
 
