@@ -139,3 +139,13 @@ Loaded Volumes 2 (thermodynamics, E&M) and 3 (optics, modern physics). The parse
 - Caveat: 55 cases, so 1 case ≈ 2 points; the vol 2/3 columns have only 6 cases each.
 
 **Redshift, now with Volume 3:** the answer found the cosmology glossary (Vol. 3 §11.6: redshift "due to cosmological expansion") next to the Doppler passages and contrasted the two pictures. It still missed Vol. 3 §5.7 (Doppler Effect for Light) and said plainly that the passages don't reconcile them. Comparison questions need passages about *both* sides; that's the case for **query decomposition** (split the question, retrieve per part).
+
+## Web app: FastAPI + Next.js
+
+Same stack as the negotiation trainer: a thin FastAPI layer over the existing Python code, and a one-page Next.js chat.
+
+- **`src/tutor/api.py`:** `POST /ask` (grounded) and `POST /ask/direct` (memory only) stream **NDJSON**: one JSON object per line, `{"type":"text"}` pieces, then `{"type":"done","answer":{sources, passages, tokens, cost}}`. NDJSON over a plain `fetch` stream is simpler than Server-Sent Events and works with POST. Errors after the stream starts are sent in-band as `{"type":"error"}`, because the HTTP 200 has already gone out. Both local models load at startup, so the first question isn't slow. CORS allows `http://localhost:3100`.
+- **`web/`** (Next.js 15, Tailwind): `lib/api.ts` reads the stream line by line, keeping a partial last line for the next chunk; `components/AnswerCard.tsx` renders Markdown, source chips, and the passages behind a `<details>`; the "Compare with memory only" toggle sends both requests in parallel and shows them side by side.
+- **Single-turn:** each question is answered on its own; earlier turns aren't sent to the model.
+- **Prompt fix found in the UI:** the memory-only answer wrote LaTeX (`$$n_1 \sin\theta_1…$$`), which Markdown shows raw. Both prompts now ask for plain-text equations with Unicode symbols.
+- CI builds and lints the frontend in a second job.

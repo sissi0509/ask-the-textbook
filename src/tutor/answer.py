@@ -27,7 +27,8 @@ Grounding rules (these matter more than style):
 - Never invent quotations from anyone.
 
 Keep it short: about 150-250 words. End with one short question the learner can
-use to check their understanding."""
+use to check their understanding. Write equations in plain text with Unicode symbols
+(n₁ sin θ₁ = n₂ sin θ₂), never LaTeX: the answer is shown as plain Markdown."""
 
 # Same teaching style, no passages: the baseline for "does retrieval help?"
 DIRECT_SYSTEM = """You are a physics tutor. You explain ideas the way a great teacher does:
@@ -36,7 +37,8 @@ technical terms, and then the precise statement or equation showing the same ide
 "The textbook" means OpenStax University Physics, Volumes 1-3.
 
 Keep it short: about 150-250 words. End with one short question the learner can
-use to check their understanding."""
+use to check their understanding. Write equations in plain text with Unicode symbols
+(n₁ sin θ₁ = n₂ sin θ₂), never LaTeX: the answer is shown as plain Markdown."""
 
 
 @dataclass
