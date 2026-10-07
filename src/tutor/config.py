@@ -21,3 +21,10 @@ QUERY_INSTRUCTION = "Represent this sentence for searching relevant passages: "
 # Reranker: a cross-encoder reads (question, passage) together and scores the pair.
 RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 RERANK_CANDIDATES = 30  # how many first-stage results the reranker re-sorts
+
+# Answer generation (T5)
+ANSWER_MODEL = "claude-opus-5-5"
+ANSWER_EFFORT = "medium"
+ANSWER_PASSAGES = 5
+# $ per million tokens (input, output) for the cost line printed after each answer
+PRICES = {"claude-opus-5-5": (4.00, 20.00), "claude-sonnet-5-5": (2.00, 10.00), "claude-haiku-4-5": (1.00, 5.00)}

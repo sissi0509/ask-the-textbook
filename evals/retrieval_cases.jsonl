@@ -12,7 +12,7 @@
 {"id": 12, "type": "textbook", "question": "What is centripetal acceleration?", "gold": ["4.4", "6.3"]}
 {"id": 13, "type": "textbook", "question": "What determines the speed of a wave on a stretched string?", "gold": ["16.3"]}
 {"id": 14, "type": "textbook", "question": "What is a standing wave?", "gold": ["16.6", "17.4"]}
-{"id": 15, "type": "everyday", "question": "Why do I lean back when the bus suddenly starts?", "gold": ["5.2"]}
+{"id": 15, "type": "everyday", "question": "Why do I lean back when the bus suddenly starts?", "gold": ["5.2", "6.3"], "note": "6.3 (Inertial Forces) uses the same example: being pushed back into a jet seat. Added after reviewing T5 answers; it was wrongly scored as a miss."}
 {"id": 16, "type": "everyday", "question": "Why does a spinning ice skater speed up when she pulls her arms in?", "gold": ["11.3"]}
 {"id": 17, "type": "everyday", "question": "Why does a siren sound higher when the ambulance comes toward me and lower after it passes?", "gold": ["17.7"]}
 {"id": 18, "type": "everyday", "question": "Why does a huge ship made of steel float?", "gold": ["14.4"]}
