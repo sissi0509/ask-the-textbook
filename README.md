@@ -40,11 +40,23 @@ flowchart LR
 
 Interfaces: a **FastAPI** backend streaming NDJSON, a **Next.js** chat page, and a CLI. All three call the same `stream_answer()`.
 
-## Results
+## Evaluation
 
-**Retrieval** (55 questions over all three volumes; a hit = the right textbook section in the top 5):
+### How retrieval is measured
 
-| Method | Recall@5 | MRR | Everyday-wording questions |
+A hand-labeled set of **55 questions** ([evals/retrieval_cases.jsonl](evals/retrieval_cases.jsonl)). Each one lists the textbook section(s) that contain the answer. Four kinds:
+
+| Kind | Example | Count | What it tests |
+|---|---|---|---|
+| Textbook wording | "What does Newton's second law state?" | 17 | the question uses the book's own words (easiest) |
+| **Everyday wording** | "Why do I lean back when the bus suddenly starts?" | 20 | how people actually ask; the book says "inertia", not "lean back" (hardest) |
+| Exact term | "Bernoulli's equation" | 17 | names and formulas, where keyword search should shine |
+| Complex | "Is redshift caused by the Doppler effect or by relativity?" | 1 | comparison across chapters and volumes |
+
+- **Recall@5:** in what share of questions is a correct section among the top 5 passages? (Those 5 are what the model reads.)
+- **MRR** (mean reciprocal rank): how close to #1 the first correct passage is. Rank 1 scores 1, rank 2 scores ½, not found scores 0.
+
+| Method | Recall@5 (all 55) | MRR | Recall@5, everyday wording (20) |
 |---|---|---|---|
 | vector | 95% | 0.90 | 85% |
 | keyword | 73% | 0.52 | 55% |
@@ -52,13 +64,21 @@ Interfaces: a **FastAPI** backend streaming NDJSON, a **Next.js** chat page, and
 | **vector + cross-encoder rerank** (default) | **98%** | **0.94** | **95%** |
 | hybrid + cross-encoder rerank | 95% | 0.93 | 85% |
 
-**What the experiments showed:**
+### What the experiments showed
+
 - **Reranking cleans the top of the list.** Before adding it, we checked that every right answer was already in the top 20 (the reranker's ceiling); it then raised MRR from 0.89 to 0.95 on Volume 1.
 - **Hybrid search helped on one volume and hurt on three.** With 3× more text, keyword search mixes up common words ("gun *kick back*" matched "*back* emf" in electric motors), so the default became vector + rerank.
 - **The model already knows this textbook.** With no retrieval, Claude named the right section for 8/8 questions, better than the retriever's top-1, but reproduced 0/5 passages word for word. So answers are tested for *faithfulness*, not only correctness.
 - **Planted facts:** six facts were changed inside a rolled-back database transaction. The memory-only answer used memory 6/6; the grounded answer reasoned from the passages 5/6 and pointed out where the planted value contradicted other passages.
 
-Details, caveats, and every decision: [docs/DESIGN.md](docs/DESIGN.md). Raw reports: [evals/results/](evals/results/).
+Raw reports: [evals/results/](evals/results/). Every decision and caveat: [docs/DESIGN.md](docs/DESIGN.md).
+
+### Limitations
+
+- **The textbook is open, so the model has likely seen it.** OpenStax is free online and almost certainly in the model's training data. A correct *answer* therefore doesn't prove retrieval worked; that's why answers are also tested with planted facts and a memory-only baseline. The *retrieval* numbers above are unaffected: they measure whether the search finds the right passage, which the language model's memory can't help with. A cleaner test would use documents the model has never seen (planned).
+- **A small eval set.** 55 questions, written by the author; one question moves a score by about 2 points. One label was already found too narrow (a correct passage scored as a miss) and was fixed.
+- **The planted-fact test was imperfect.** Each edit changed one spelling of a value, but other passages kept the real value, so the "fake" book contradicted itself. A stricter version would change every form of a fact or use invented facts, scored by an LLM judge.
+- **Scope of v1:** paragraphs and glossary definitions only (no worked examples or figures); single-turn questions; 6 very long chunks are cut off at the embedding model's 512-token limit.
 
 ## Run it
 
