@@ -36,3 +36,13 @@ ALTER TABLE chunks ADD COLUMN IF NOT EXISTS search_vector tsvector
         to_tsvector('english', coalesce(subsection_title, '') || ' ' || content)
     ) STORED;
 CREATE INDEX IF NOT EXISTS chunks_search_vector_idx ON chunks USING GIN (search_vector);
+
+-- Extra embedding models for the model comparison (evals/compare_models.py).
+-- The app's default model stays in chunks.embedding. The vector has no fixed
+-- size because models differ (384 vs 768); fine without an ANN index.
+CREATE TABLE IF NOT EXISTS chunk_embeddings (
+    chunk_id   BIGINT NOT NULL REFERENCES chunks(id) ON DELETE CASCADE,
+    model      TEXT NOT NULL,                  -- Hugging Face model name
+    embedding  vector NOT NULL,
+    PRIMARY KEY (chunk_id, model)
+);

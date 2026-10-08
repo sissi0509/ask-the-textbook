@@ -22,6 +22,19 @@ QUERY_INSTRUCTION = "Represent this sentence for searching relevant passages: "
 RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 RERANK_CANDIDATES = 30  # how many first-stage results the reranker re-sorts
 
+# Model comparison (evals/compare_models.py). The defaults above are the baselines.
+# Embedding model -> the prefix it expects on queries ("" = none).
+EMBEDDING_MODELS = {
+    EMBEDDING_MODEL: QUERY_INSTRUCTION,                # 384-d, the app's default
+    "BAAI/bge-base-en-v1.5": QUERY_INSTRUCTION,        # 768-d, same family, bigger
+    "sentence-transformers/all-MiniLM-L6-v2": "",      # 384-d, a different, older family
+}
+RERANK_MODELS = [
+    RERANK_MODEL,                                      # 6 layers, the app's default
+    "cross-encoder/ms-marco-MiniLM-L-12-v2",           # same training, 12 layers
+    # Next: a different family (BAAI/bge-reranker-base); its 1.1 GB download kept failing.
+]
+
 # Retrieval method used for answers. vector_rerank won on the 3-volume eval
 # (see docs/DESIGN.md "All three volumes"); hybrid_rerank won on Volume 1 alone.
 DEFAULT_METHOD = "vector_rerank"
