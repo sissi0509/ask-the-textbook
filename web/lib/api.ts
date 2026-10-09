@@ -8,6 +8,8 @@ export type AnswerResult = {
   text: string;
   sources: Source[];
   invalid_citations: number[];
+  grounded: boolean; // passed the citation gate (cites at least one real passage)
+  attempts: number;
   passages: Passage[];
   input_tokens: number;
   output_tokens: number;
@@ -16,6 +18,7 @@ export type AnswerResult = {
 
 type StreamEvent =
   | { type: "text"; text: string }
+  | { type: "retry"; reason: string }
   | { type: "done"; answer: AnswerResult }
   | { type: "error"; message: string };
 
@@ -23,11 +26,14 @@ type StreamEvent =
  * POST a question and read the answer as it streams.
  * The backend sends NDJSON: one JSON object per line ("text" pieces, then "done").
  * Calls onText with each new piece; resolves with the finished answer.
+ * Calls onRetry when an attempt failed the citation gate: drop the text so far,
+ * a new attempt streams next.
  */
 export async function streamAnswer(
   path: "/ask" | "/ask/direct",
   question: string,
   onText: (piece: string) => void,
+  onRetry: () => void = () => {},
 ): Promise<AnswerResult> {
   const response = await fetch(`${API_URL}${path}`, {
     method: "POST",
@@ -52,6 +58,7 @@ export async function streamAnswer(
       if (!line.trim()) continue;
       const event = JSON.parse(line) as StreamEvent;
       if (event.type === "text") onText(event.text);
+      else if (event.type === "retry") onRetry();
       else if (event.type === "done") return event.answer;
       else throw new Error(event.message);
     }

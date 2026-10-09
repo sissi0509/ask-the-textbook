@@ -30,6 +30,9 @@ DEFAULT_METHOD = "vector_rerank"
 ANSWER_MODEL = "claude-opus-5-5"
 ANSWER_EFFORT = "medium"
 ANSWER_PASSAGES = 5
+# Citation gate: an answer with no valid citation is sent back to the model this many
+# times with a correction. One retry bounds the extra cost and wait.
+CITATION_RETRIES = 1
 # $ per million tokens (input, output) for the cost line printed after each answer
 PRICES = {"claude-opus-5-5": (4.00, 20.00), "claude-sonnet-5-5": (2.00, 10.00), "claude-haiku-4-5": (1.00, 5.00)}
 

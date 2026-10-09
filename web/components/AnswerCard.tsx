@@ -35,6 +35,13 @@ export default function AnswerCard({ answer, showTitle }: { answer: AnswerState;
 
       {error && <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">{error}</p>}
 
+      {result && kind === "textbook" && result.grounded === false && (
+        <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          ⚠ Not grounded in the textbook: this answer failed the citation check after {result.attempts}{" "}
+          {result.attempts === 1 ? "attempt" : "attempts"}. Treat it as unverified.
+        </p>
+      )}
+
       {result && kind === "textbook" && (
         <div className="mt-4 border-t border-stone-200 pt-3 dark:border-stone-700">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-500">Sources</p>
@@ -72,6 +79,7 @@ export default function AnswerCard({ answer, showTitle }: { answer: AnswerState;
         <p className="mt-3 text-xs text-stone-400">
           {result.input_tokens.toLocaleString()} in / {result.output_tokens.toLocaleString()} out tokens · ~$
           {result.cost_usd.toFixed(3)}
+          {result.attempts > 1 && ` · rewritten to fix citations (${result.attempts} attempts)`}
         </p>
       )}
     </div>

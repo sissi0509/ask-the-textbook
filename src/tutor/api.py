@@ -6,7 +6,9 @@ Answers stream as NDJSON (one JSON object per line), so the page can show
 text as it's written:
     {"type": "text", "text": "Imagine a "}
     {"type": "text", "text": "tablecloth..."}
-    {"type": "done", "answer": {...sources, passages, cost...}}
+    {"type": "retry", "reason": "it cites no passages"}   (failed the citation gate:
+                                                           drop the text so far)
+    {"type": "done", "answer": {...sources, passages, grounded, cost...}}
     {"type": "error", "message": "..."}      (instead of "done", if it fails)
 """
 
@@ -22,7 +24,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from tutor import embeddings, rerank
-from tutor.answer import Answer, label, stream_answer, stream_direct_answer
+from tutor.answer import Answer, Retry, label, stream_answer, stream_direct_answer
 from tutor.config import DEFAULT_METHOD, FRONTEND_ORIGINS
 from tutor.db import connect
 from tutor.retrieve import METHODS
@@ -58,6 +60,8 @@ def answer_json(answer: Answer) -> dict:
             for n in answer.cited if 1 <= n <= len(answer.passages)
         ],
         "invalid_citations": answer.invalid,
+        "grounded": answer.grounded,
+        "attempts": answer.attempts,
         "passages": [{"n": i, "label": label(h), "content": h.content}
                      for i, h in enumerate(answer.passages, start=1)],
         "input_tokens": answer.input_tokens,
@@ -66,11 +70,13 @@ def answer_json(answer: Answer) -> dict:
     }
 
 
-def ndjson(stream: Iterator[str | Answer]) -> Iterator[str]:
+def ndjson(stream: Iterator[str | Retry | Answer]) -> Iterator[str]:
     try:
         for piece in stream:
             if isinstance(piece, Answer):
                 yield json.dumps({"type": "done", "answer": answer_json(piece)}) + "\n"
+            elif isinstance(piece, Retry):
+                yield json.dumps({"type": "retry", "reason": piece.reason}) + "\n"
             else:
                 yield json.dumps({"type": "text", "text": piece}) + "\n"
     # The stream has already started (HTTP 200 sent), so errors are reported in-band.
