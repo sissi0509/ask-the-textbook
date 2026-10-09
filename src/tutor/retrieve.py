@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import psycopg
 from pgvector.psycopg import register_vector
 
-from tutor.config import RERANK_CANDIDATES
+from tutor.config import EMBEDDING_MODEL, RERANK_CANDIDATES, RERANK_MODEL
 from tutor.embeddings import embed_query
 from tutor.rerank import rerank_scores
 
@@ -47,15 +47,26 @@ class Hit:
         return f"{self.volume}:{self.section_number}"
 
 
-def vector_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]:
+def vector_search(
+    conn: psycopg.Connection, question: str, k: int, embedding_model: str = EMBEDDING_MODEL
+) -> list[Hit]:
     register_vector(conn)
-    rows = conn.execute(
-        f"""SELECT {COLUMNS}, 1 - (c.embedding <=> %(q)s) AS score{VOLUME}
+    q = embed_query(question, model=embedding_model)
+    if embedding_model == EMBEDDING_MODEL:
+        sql = f"""SELECT {COLUMNS}, 1 - (c.embedding <=> %(q)s) AS score{VOLUME}
             FROM chunks c JOIN sections s ON s.id = c.section_id
             ORDER BY c.embedding <=> %(q)s
-            LIMIT %(k)s""",
-        {"q": embed_query(question), "k": k},
-    ).fetchall()
+            LIMIT %(k)s"""
+    else:
+        # Other models' vectors live in chunk_embeddings (one row per chunk per model).
+        sql = f"""SELECT {COLUMNS}, 1 - (e.embedding <=> %(q)s) AS score{VOLUME}
+            FROM chunk_embeddings e
+            JOIN chunks c ON c.id = e.chunk_id
+            JOIN sections s ON s.id = c.section_id
+            WHERE e.model = %(model)s
+            ORDER BY e.embedding <=> %(q)s
+            LIMIT %(k)s"""
+    rows = conn.execute(sql, {"q": q, "k": k, "model": embedding_model}).fetchall()
     return [Hit(*row) for row in rows]
 
 
@@ -100,7 +111,7 @@ def hybrid_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]:
     )
 
 
-def rerank(question: str, candidates: list[Hit], k: int) -> list[Hit]:
+def rerank(question: str, candidates: list[Hit], k: int, model: str = RERANK_MODEL) -> list[Hit]:
     """Second stage: re-sort first-stage candidates by cross-encoder score."""
     if not candidates:
         return []
@@ -108,13 +119,17 @@ def rerank(question: str, candidates: list[Hit], k: int) -> list[Hit]:
         " › ".join(filter(None, [h.section_title, h.subsection_title])) + "\n" + h.content
         for h in candidates
     ]
-    scores = rerank_scores(question, passages)
+    scores = rerank_scores(question, passages, model=model)
     ranked = sorted(zip(candidates, scores, strict=True), key=lambda pair: pair[1], reverse=True)
     return [Hit(**{**hit.__dict__, "score": float(score)}) for hit, score in ranked[:k]]
 
 
-def vector_rerank_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]:
-    return rerank(question, vector_search(conn, question, RERANK_CANDIDATES), k)
+def vector_rerank_search(
+    conn: psycopg.Connection, question: str, k: int,
+    embedding_model: str = EMBEDDING_MODEL, rerank_model: str = RERANK_MODEL,
+) -> list[Hit]:
+    candidates = vector_search(conn, question, RERANK_CANDIDATES, embedding_model)
+    return rerank(question, candidates, k, model=rerank_model)
 
 
 def hybrid_rerank_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]:

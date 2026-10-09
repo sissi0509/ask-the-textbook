@@ -4,24 +4,24 @@ Passages and queries are embedded separately, so every chunk's vector is
 computed once at ingest time and only the question is embedded per search.
 """
 
-from functools import lru_cache
+from functools import cache
 
 import numpy as np
 
-from tutor.config import EMBEDDING_MODEL, QUERY_INSTRUCTION
+from tutor.config import EMBEDDING_MODEL, EMBEDDING_MODELS
 
 
-@lru_cache(maxsize=1)
-def get_model():
+@cache
+def get_model(model: str = EMBEDDING_MODEL):
     # Imported here so modules that only need passage_text() stay fast to load.
     from sentence_transformers import SentenceTransformer
 
     # Use the cached copy without asking the Hugging Face Hub (a slow network
     # check that can take minutes); download only the first time.
     try:
-        return SentenceTransformer(EMBEDDING_MODEL, local_files_only=True)
+        return SentenceTransformer(model, local_files_only=True)
     except OSError:
-        return SentenceTransformer(EMBEDDING_MODEL)
+        return SentenceTransformer(model)
 
 
 def passage_text(
@@ -44,15 +44,17 @@ def passage_text(
     return " › ".join(path) + "\n\n" + content
 
 
-def embed_passages(texts: list[str], batch_size: int = 64) -> np.ndarray:
+def embed_passages(texts: list[str], batch_size: int = 64, model: str = EMBEDDING_MODEL) -> np.ndarray:
     # normalize -> every vector has length 1, so cosine similarity = dot product
-    return get_model().encode(
+    return get_model(model).encode(
         texts, batch_size=batch_size, normalize_embeddings=True, show_progress_bar=True
     )
 
 
-def embed_query(question: str) -> np.ndarray:
-    return get_model().encode(QUERY_INSTRUCTION + question, normalize_embeddings=True)
+def embed_query(question: str, model: str = EMBEDDING_MODEL) -> np.ndarray:
+    # Some models were trained with a prefix on queries (bge), others with none.
+    prefix = EMBEDDING_MODELS.get(model, "")
+    return get_model(model).encode(prefix + question, normalize_embeddings=True)
 
 
 def token_count(text: str) -> int:
