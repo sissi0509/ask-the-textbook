@@ -6,7 +6,7 @@ Run:  uv run python -m tutor.cli "Why do I lean back when the bus starts?"
 
 import argparse
 
-from tutor.answer import Answer, label, stream_answer
+from tutor.answer import Answer, Retry, label, stream_answer
 from tutor.config import DEFAULT_METHOD
 from tutor.db import connect
 from tutor.retrieve import METHODS
@@ -24,6 +24,8 @@ def main() -> None:
         for piece in stream_answer(conn, args.question, method=args.method):
             if isinstance(piece, Answer):
                 answer = piece
+            elif isinstance(piece, Retry):
+                print(f"\n\n↻ Retrying: the answer above failed the citation check ({piece.reason}).\n")
             else:
                 print(piece, end="", flush=True)
     print("\n")
@@ -36,6 +38,8 @@ def main() -> None:
         print(f"  ⚠ cited passages that weren't provided: {answer.invalid}")
     if not answer.cited:
         print("  ⚠ the answer cites no passages")
+    if not answer.grounded:
+        print(f"  ⚠ not grounded: failed the citation check after {answer.attempts} attempts")
     if args.passages:
         print("\nRetrieved passages")
         for i, hit in enumerate(answer.passages, start=1):

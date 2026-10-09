@@ -60,8 +60,12 @@ export default function Home() {
     await Promise.all(
       kinds.map(async (kind, index) => {
         try {
-          const result = await streamAnswer(kind === "textbook" ? "/ask" : "/ask/direct", q, (piece) =>
-            updateAnswer(index, (a) => ({ ...a, text: a.text + piece })),
+          const result = await streamAnswer(
+            kind === "textbook" ? "/ask" : "/ask/direct",
+            q,
+            (piece) => updateAnswer(index, (a) => ({ ...a, text: a.text + piece })),
+            // The first attempt failed the citation check: clear it, the retry streams next.
+            () => updateAnswer(index, (a) => ({ ...a, text: "" })),
           );
           updateAnswer(index, (a) => ({ ...a, text: result.text, result }));
         } catch (err) {
