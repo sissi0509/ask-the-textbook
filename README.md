@@ -114,7 +114,7 @@ Each answer costs about $0.02.
 
 ```bash
 uv run pytest                                   # unit tests (no API calls)
-uv run python evals/run_retrieval_eval.py       # retrieval: Recall@5/@10, MRR, by question type and volume
+uv run python evals/run_retrieval_eval.py       # retrieval: Recall@5/@10, MRR, by question type, volume and topic
 uv run python evals/contamination_probe.py      # what the model knows without retrieval
 uv run python evals/compare_direct_vs_rag.py    # memory-only vs grounded, incl. planted facts
 ```
