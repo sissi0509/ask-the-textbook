@@ -36,7 +36,7 @@ flowchart LR
 
 1. **Retrieve:** a local bi-encoder (`bge-small-en-v1.5`) finds the 30 closest chunks in Postgres + pgvector. Keyword search (Postgres full-text) can run in parallel and be merged with Reciprocal Rank Fusion.
 2. **Rerank:** a local cross-encoder (`ms-marco-MiniLM-L-6-v2`) reads the question and each candidate *together* and keeps the best 5.
-3. **Augment + generate:** the 5 passages go into a prompt with grounding rules (facts only from the passages, cite `[n]`, say what's missing). Claude writes the explanation; code turns `[n]` into section labels and flags any citation that doesn't exist.
+3. **Augment + generate:** the 5 passages go into a prompt with grounding rules (facts only from the passages, cite `[n]`, say what's missing). Claude writes the explanation; code turns `[n]` into section labels. **Citation gate:** an answer must cite at least one real passage; if not, the model gets one retry with a correction, and an answer that still fails is shown as *Not grounded*.
 
 Interfaces: a **FastAPI** backend streaming NDJSON, a **Next.js** chat page, and a CLI. All three call the same `stream_answer()`.
 
@@ -68,6 +68,7 @@ A hand-labeled set of **55 questions** ([evals/retrieval_cases.jsonl](evals/retr
 
 - **Reranking cleans the top of the list.** Before adding it, we checked that every right answer was already in the top 20 (the reranker's ceiling); it then raised MRR from 0.89 to 0.95 on Volume 1.
 - **Hybrid search helped on one volume and hurt on three.** With 3× more text, keyword search mixes up common words ("gun *kick back*" matched "*back* emf" in electric motors), so the default became vector + rerank.
+- **The reranker matters more than the embedding model.** Swapping the bi-encoder (bge-small, bge-base, all-MiniLM-L6) and the cross-encoder (MiniLM-L6 vs L12) moved Recall@5 by only 1–2 questions once a reranker was on; the 2× bigger bge-base was no better than bge-small, and the 12-layer reranker cost ~60% more time for no MRR gain. Defaults unchanged. [Full table](evals/results/2026-10-08-model-comparison.md).
 - **The model already knows this textbook.** With no retrieval, Claude named the right section for 8/8 questions, better than the retriever's top-1, but reproduced 0/5 passages word for word. So answers are tested for *faithfulness*, not only correctness.
 - **Planted facts:** six facts were changed inside a rolled-back database transaction. The memory-only answer used memory 6/6; the grounded answer reasoned from the passages 5/6 and pointed out where the planted value contradicted other passages.
 
@@ -115,6 +116,7 @@ Each answer costs about $0.02.
 ```bash
 uv run pytest                                   # unit tests (no API calls)
 uv run python evals/run_retrieval_eval.py       # retrieval: Recall@5/@10, MRR, by question type, volume and topic
+uv run python evals/compare_models.py           # embedding models x rerankers on the retrieval eval
 uv run python evals/contamination_probe.py      # what the model knows without retrieval
 uv run python evals/compare_direct_vs_rag.py    # memory-only vs grounded, incl. planted facts
 ```
