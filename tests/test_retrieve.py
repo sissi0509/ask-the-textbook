@@ -113,3 +113,13 @@ def test_bm25_search_ranks_chunks_and_builds_the_index_once(monkeypatch):
     assert [h.chunk_id for h in first] == [1, 2]  # chunk 3 has no matching word
     assert first[0].score > first[1].score > 0
     assert conn.calls == 1  # second search reused the in-memory index
+
+
+def test_hybrid_bm25_fuses_vector_and_bm25_results(monkeypatch):
+    import tutor.retrieve as retrieve_module
+
+    monkeypatch.setattr(retrieve_module, "vector_search", lambda conn, q, k: [hit(1), hit(2)])
+    monkeypatch.setattr(retrieve_module, "bm25_search", lambda conn, q, k: [hit(3), hit(1)])
+    merged = retrieve_module.hybrid_bm25_search(None, "q", 3)
+    assert merged[0].chunk_id == 1  # found by both lists
+    assert {h.chunk_id for h in merged} == {1, 2, 3}

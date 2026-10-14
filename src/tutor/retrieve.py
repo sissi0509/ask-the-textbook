@@ -4,9 +4,11 @@ Each method adds one layer, so the eval can measure what every layer adds:
   vector          meaning: cosine distance between question and chunk embeddings
   keyword         exact words: Postgres full-text search (ts_rank_cd, no IDF)
   bm25            exact words: BM25 over all chunks, in memory (bm25.py)
-  hybrid          both, merged with Reciprocal Rank Fusion (RRF)
+  hybrid          vector + keyword, merged with Reciprocal Rank Fusion (RRF)
+  hybrid_bm25     vector + bm25, merged with RRF
   vector_rerank   vector top 30, re-sorted by a cross-encoder
   hybrid_rerank   hybrid top 30, re-sorted by a cross-encoder
+  hybrid_bm25_rerank  hybrid_bm25 top 30, re-sorted by a cross-encoder
 """
 
 from dataclasses import dataclass
@@ -133,6 +135,13 @@ def hybrid_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]:
     )
 
 
+def hybrid_bm25_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]:
+    return rrf_merge(
+        [vector_search(conn, question, CANDIDATES), bm25_search(conn, question, CANDIDATES)],
+        k,
+    )
+
+
 def rerank(question: str, candidates: list[Hit], k: int, model: str = RERANK_MODEL) -> list[Hit]:
     """Second stage: re-sort first-stage candidates by cross-encoder score."""
     if not candidates:
@@ -158,13 +167,19 @@ def hybrid_rerank_search(conn: psycopg.Connection, question: str, k: int) -> lis
     return rerank(question, hybrid_search(conn, question, RERANK_CANDIDATES), k)
 
 
+def hybrid_bm25_rerank_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]:
+    return rerank(question, hybrid_bm25_search(conn, question, RERANK_CANDIDATES), k)
+
+
 METHODS = {
     "vector": vector_search,
     "keyword": keyword_search,
     "bm25": bm25_search,
     "hybrid": hybrid_search,
+    "hybrid_bm25": hybrid_bm25_search,
     "vector_rerank": vector_rerank_search,
     "hybrid_rerank": hybrid_rerank_search,
+    "hybrid_bm25_rerank": hybrid_bm25_rerank_search,
 }
 
 

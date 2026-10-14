@@ -158,7 +158,22 @@ Loaded Volumes 2 (thermodynamics, E&M) and 3 (optics, modern physics). The parse
 - **IDF fixed the collisions:** "gun kick back" (#19) and the garden-hose question (#27) are now hits, and **vector misses both**. So BM25 finds things the embeddings can't, which is the whole argument for hybrid.
 - **Everyday questions: 55% → 90%,** above vector's 85%.
 - **Still missed:** bus/inertia (#15) and guitar beats (#23) (no shared words); "Fermi estimate" (#40) and Faraday's law (#49): right chapter, wrong section; linear momentum (#3).
-- Next: `hybrid_bm25` and `hybrid_bm25_rerank` vs. `vector_rerank`. Report: `evals/results/2026-10-14-keyword-bm25-vector-vector_rerank.md`.
+- Report: `evals/results/2026-10-14-keyword-bm25-vector-vector_rerank.md`.
+
+**Hybrid with BM25 (same day, same 55 cases):**
+
+| Method | Recall@5 | Recall@10 | MRR | R@5 everyday | R@5 textbook |
+|---|---|---|---|---|---|
+| hybrid (vector + ts_rank_cd) | 91% | 93% | 0.82 | 85% | 88% |
+| **hybrid_bm25** (vector + BM25) | **95%** | 96% | 0.85 | 90% | 94% |
+| hybrid_rerank | 95% | 98% | 0.93 | 85% | 100% |
+| hybrid_bm25_rerank | 96% | 98% | 0.94 | 90% | 100% |
+| **vector + rerank** (default) | **98%** | 98% | 0.94 | 95% | 100% |
+
+- **BM25 makes hybrid useful again:** before reranking, hybrid goes from 91% to 95%; "gun kick back" and the grandfather clock are no longer lost to collisions.
+- **But it doesn't beat the default.** `hybrid_bm25_rerank` (96%) vs. `vector_rerank` (98%) is **one question**: the bus/inertia case (#15), where BM25 candidates take RRF slots that a good vector candidate needed. MRR ties at 0.94. Within noise at 55 cases, so **`DEFAULT_METHOD` stays `vector_rerank`** (simpler, one less path).
+- **Where BM25 should matter more:** exact-term queries on a bigger, harder eval set. The current set has only 17 term questions, and vector already gets all of them.
+- **Next fix to try:** rerank the *union* of vector top 30 + BM25 top 10, so BM25 can only add candidates, never push vector ones out. Report: `evals/results/2026-10-14-bm25-hybrid-hybrid_bm25-vector_rerank-hybrid_rerank-hybrid_bm25_rerank.md`.
 
 ## Web app: FastAPI + Next.js
 
