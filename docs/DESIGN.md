@@ -171,9 +171,9 @@ Loaded Volumes 2 (thermodynamics, E&M) and 3 (optics, modern physics). The parse
 | **vector + rerank** (default) | **98%** | 98% | 0.94 | 95% | 100% |
 
 - **BM25 makes hybrid useful again:** before reranking, hybrid goes from 91% to 95%; "gun kick back" and the grandfather clock are no longer lost to collisions.
-- **But it doesn't beat the default.** `hybrid_bm25_rerank` (96%) vs. `vector_rerank` (98%) is **one question**: the bus/inertia case (#15), where BM25 candidates take RRF slots that a good vector candidate needed. MRR ties at 0.94. Within noise at 55 cases, so **`DEFAULT_METHOD` stays `vector_rerank`** (simpler, one less path).
+- **But it doesn't beat the default.** `hybrid_bm25_rerank` (96%) vs. `vector_rerank` (98%) is **one question**: the bus/inertia case (#15). It's **not** a lost candidate: Recall@30 (what the reranker sees) is 100% for both vector and hybrid_bm25, and the bus gold section is in both lists (rank 3 vs. 11). BM25 also brought in a **distractor** (Vol. 2 §13.6, matched on "starts") that the cross-encoder scored higher. MRR ties at 0.94. Within noise at 55 cases, so **`DEFAULT_METHOD` stays `vector_rerank`** (simpler, one less path).
 - **Where BM25 should matter more:** exact-term queries on a bigger, harder eval set. The current set has only 17 term questions, and vector already gets all of them.
-- **Next fix to try:** rerank the *union* of vector top 30 + BM25 top 10, so BM25 can only add candidates, never push vector ones out. Report: `evals/results/2026-10-14-bm25-hybrid-hybrid_bm25-vector_rerank-hybrid_rerank-hybrid_bm25_rerank.md`.
+- **Next fix to try (revised):** union fusion wouldn't help here, since the gold was never pushed out, and more candidates means more distractors. The weak link is the reranker on everyday wording; options are a stronger cross-encoder or HyDE (rewrite the question in textbook words before searching). Report: `evals/results/2026-10-14-bm25-hybrid-hybrid_bm25-vector_rerank-hybrid_rerank-hybrid_bm25_rerank.md`.
 
 ## Web app: FastAPI + Next.js
 
