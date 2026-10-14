@@ -2,7 +2,8 @@
 
 Each method adds one layer, so the eval can measure what every layer adds:
   vector          meaning: cosine distance between question and chunk embeddings
-  keyword         exact words: Postgres full-text search
+  keyword         exact words: Postgres full-text search (ts_rank_cd, no IDF)
+  bm25            exact words: BM25 over all chunks, in memory (bm25.py)
   hybrid          both, merged with Reciprocal Rank Fusion (RRF)
   vector_rerank   vector top 30, re-sorted by a cross-encoder
   hybrid_rerank   hybrid top 30, re-sorted by a cross-encoder
@@ -13,6 +14,7 @@ from dataclasses import dataclass
 import psycopg
 from pgvector.psycopg import register_vector
 
+from tutor.bm25 import BM25Index
 from tutor.config import EMBEDDING_MODEL, RERANK_CANDIDATES, RERANK_MODEL
 from tutor.embeddings import embed_query
 from tutor.rerank import rerank_scores
@@ -88,6 +90,26 @@ def keyword_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]
     return [Hit(*row) for row in rows]
 
 
+_bm25: tuple[BM25Index, list[Hit]] | None = None  # built on first use, then reused
+
+
+def bm25_search(conn: psycopg.Connection, question: str, k: int) -> list[Hit]:
+    global _bm25
+    if _bm25 is None:
+        rows = conn.execute(
+            f"""SELECT {COLUMNS}, 0.0 AS score{VOLUME}
+                FROM chunks c JOIN sections s ON s.id = c.section_id
+                ORDER BY c.id"""
+        ).fetchall()
+        chunks = [Hit(*row) for row in rows]
+        # Same text as the full-text column (subsection title + content), so the
+        # keyword-vs-bm25 comparison is about scoring, not input.
+        texts = [f"{h.subsection_title or ''} {h.content}" for h in chunks]
+        _bm25 = (BM25Index(texts), chunks)
+    index, chunks = _bm25
+    return [Hit(**{**chunks[i].__dict__, "score": s}) for i, s in index.top_k(question, k)]
+
+
 def rrf_merge(result_lists: list[list[Hit]], k: int) -> list[Hit]:
     """Reciprocal Rank Fusion: score = sum over lists of 1 / (RRF_K + rank).
 
@@ -139,6 +161,7 @@ def hybrid_rerank_search(conn: psycopg.Connection, question: str, k: int) -> lis
 METHODS = {
     "vector": vector_search,
     "keyword": keyword_search,
+    "bm25": bm25_search,
     "hybrid": hybrid_search,
     "vector_rerank": vector_rerank_search,
     "hybrid_rerank": hybrid_rerank_search,

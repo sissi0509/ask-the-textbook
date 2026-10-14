@@ -83,3 +83,33 @@ def test_vector_search_reads_extra_models_from_chunk_embeddings(monkeypatch):
     assert "chunk_embeddings" not in default.sql  # the app's default path is unchanged
     assert "chunk_embeddings" in other.sql
     assert other.params["model"] == "BAAI/bge-base-en-v1.5"
+
+
+class ChunkConn:
+    """Returns fixed chunk rows; counts how many times it was queried."""
+
+    def __init__(self, contents):
+        self.calls = 0
+        self.rows = [(i, "m1", "1.1", "Title", None, "text", c, 0.0, 1, 1)
+                     for i, c in enumerate(contents, start=1)]
+
+    def execute(self, sql, params=None):
+        self.calls += 1
+        return self
+
+    def fetchall(self):
+        return self.rows
+
+
+def test_bm25_search_ranks_chunks_and_builds_the_index_once(monkeypatch):
+    import tutor.retrieve as retrieve_module
+
+    monkeypatch.setattr(retrieve_module, "_bm25", None)
+    conn = ChunkConn(["centripetal force circle", "force force force push", "bus starts"])
+
+    first = retrieve_module.bm25_search(conn, "centripetal force", 5)
+    retrieve_module.bm25_search(conn, "bus", 5)
+
+    assert [h.chunk_id for h in first] == [1, 2]  # chunk 3 has no matching word
+    assert first[0].score > first[1].score > 0
+    assert conn.calls == 1  # second search reused the in-memory index

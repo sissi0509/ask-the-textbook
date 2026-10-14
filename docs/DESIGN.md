@@ -140,6 +140,26 @@ Loaded Volumes 2 (thermodynamics, E&M) and 3 (optics, modern physics). The parse
 
 **Redshift, now with Volume 3:** the answer found the cosmology glossary (Vol. 3 §11.6: redshift "due to cosmological expansion") next to the Doppler passages and contrasted the two pictures. It still missed Vol. 3 §5.7 (Doppler Effect for Light) and said plainly that the passages don't reconcile them. Comparison questions need passages about *both* sides; that's the case for **query decomposition** (split the question, retrieve per part).
 
+## BM25 instead of Postgres full-text (2026-10-14)
+
+**Hypothesis:** the keyword collisions above come from `ts_rank_cd` having no IDF: "back" and "starts" count as much as "centripetal". BM25 down-weights words that appear in many chunks.
+
+**What:** `src/tutor/bm25.py`, hand-written BM25 (k1 = 1.2, b = 0.75) over the same text as the full-text column (subsection title + content). Each chunk is one document. The index is built in memory on first use (chunking still changes, so a saved index would go stale). Tokenizer: lowercase, split on non-alphanumerics, small stop-word list, **no stemming** yet.
+
+**Results (same 55 cases, 3 volumes):**
+
+| Method | Recall@5 | Recall@10 | MRR | R@5 everyday | R@5 term | R@5 textbook |
+|---|---|---|---|---|---|---|
+| keyword (ts_rank_cd) | 73% | 82% | 0.52 | 55% | 94% | 71% |
+| **bm25** | **91%** | **95%** | **0.82** | **90%** | 94% | 88% |
+| vector | 95% | 95% | 0.90 | 85% | 100% | 100% |
+| vector + rerank | 98% | 98% | 0.94 | 95% | 100% | 100% |
+
+- **IDF fixed the collisions:** "gun kick back" (#19) and the garden-hose question (#27) are now hits, and **vector misses both**. So BM25 finds things the embeddings can't, which is the whole argument for hybrid.
+- **Everyday questions: 55% → 90%,** above vector's 85%.
+- **Still missed:** bus/inertia (#15) and guitar beats (#23) (no shared words); "Fermi estimate" (#40) and Faraday's law (#49): right chapter, wrong section; linear momentum (#3).
+- Next: `hybrid_bm25` and `hybrid_bm25_rerank` vs. `vector_rerank`. Report: `evals/results/2026-10-14-keyword-bm25-vector-vector_rerank.md`.
+
 ## Web app: FastAPI + Next.js
 
 Same stack as the negotiation trainer: a thin FastAPI layer over the existing Python code, and a one-page Next.js chat.
