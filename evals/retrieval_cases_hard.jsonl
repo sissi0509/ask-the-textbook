@@ -35,3 +35,21 @@
 {"id": 135, "type": "everyday", "topic": "Optics", "question": "Why do soap bubbles have swirly colors?", "gold": ["3:3.4"], "note": "thin-film interference"}
 {"id": 136, "type": "everyday", "topic": "Optics", "question": "How can doctors look inside your stomach with a thin bendy tube?", "gold": ["3:1.4"], "note": "fiber optics / endoscope"}
 {"id": 137, "type": "everyday", "topic": "Optics", "question": "Why do road signs shine so brightly in my headlights at night?", "gold": ["3:1.2"], "note": "retroreflection"}
+{"id": 138, "type": "everyday", "topic": "Mechanics", "question": "Why do I feel heavier for a second when the elevator starts going up?", "gold": ["1:6.1"], "note": "scale reading in an accelerating elevator; 'starts' collides with motor sections"}
+{"id": 139, "type": "everyday", "topic": "Mechanics", "question": "Why do astronauts on the space station float around?", "gold": ["1:13.4", "1:5.4"], "note": "orbit = free fall; 5.4 defines weightlessness as free fall"}
+{"id": 140, "type": "everyday", "topic": "Mechanics", "question": "Why are there two high tides every day?", "gold": ["1:13.6"], "note": "tidal forces"}
+{"id": 141, "type": "everyday", "topic": "Electricity & Magnetism", "question": "Why does the breaker cut the power when I run too many appliances at once?", "gold": ["2:10.6", "2:9.5"], "note": "fuses/breakers limit excessive current"}
+{"id": 142, "type": "everyday", "topic": "Modern Physics", "question": "How can scientists tell how old a mummy is?", "gold": ["3:10.3"], "note": "carbon-14 dating, no physics words in the question"}
+{"id": 143, "type": "everyday", "topic": "Mechanics", "question": "Why does a hot air balloon rise?", "gold": ["1:14.4"], "note": "buoyancy"}
+{"id": 144, "type": "everyday", "topic": "Electricity & Magnetism", "question": "How does an induction stove heat the pan without getting hot itself?", "gold": ["2:13.5"], "note": "eddy currents"}
+{"id": 145, "type": "everyday", "topic": "Electricity & Magnetism", "question": "What makes the northern lights glow?", "gold": ["2:11.3"], "note": "charged particles trapped in Earth's field"}
+{"id": 146, "type": "everyday", "topic": "Electricity & Magnetism", "question": "Why does a balloon stick to the wall after I rub it on my hair?", "gold": ["2:5.1"], "note": "static charge"}
+{"id": 147, "type": "everyday", "topic": "Electricity & Magnetism", "question": "What part of sunlight gives you a sunburn?", "gold": ["2:16.5"], "note": "UV-B / UV-C"}
+{"id": 148, "type": "everyday", "topic": "Thermodynamics", "question": "Why is the grass wet in the early morning even when it didn't rain?", "gold": ["2:2.2", "2:1.5"], "note": "dew point, condensation"}
+{"id": 149, "type": "everyday", "topic": "Electricity & Magnetism", "question": "Why does a compass needle point north?", "gold": ["2:11.1"], "note": "Earth as a magnet"}
+{"id": 150, "type": "everyday", "topic": "Thermodynamics", "question": "Why is the black parking lot hotter than the gray sidewalk next to it on a sunny day?", "gold": ["2:1.6"], "note": "radiation absorption depends on color"}
+{"id": 151, "type": "everyday", "topic": "Mechanics", "question": "Why do I feel pushed back into my seat when a plane takes off?", "gold": ["1:6.3", "1:5.2"], "note": "same physics as the bus case; inertial forces subsection uses this exact example"}
+{"id": 152, "type": "everyday", "topic": "Mechanics", "question": "Why does the water push harder on me the deeper I swim in a pool?", "gold": ["1:14.1"], "note": "pressure varies with depth"}
+{"id": 153, "type": "everyday", "topic": "Thermodynamics", "question": "Why does a car engine turn so much of its fuel into wasted heat?", "gold": ["2:4.2"], "note": "heat engine efficiency"}
+{"id": 154, "type": "everyday", "topic": "Thermodynamics", "question": "How does a fridge keep the inside cold while the back of it feels warm?", "gold": ["2:4.3"], "note": "refrigerator moves heat cold -> hot"}
+{"id": 155, "type": "everyday", "topic": "Mechanics", "question": "Why does my bathroom scale read less when the elevator starts going down?", "gold": ["1:6.1"], "note": "same section as #138, different wording"}

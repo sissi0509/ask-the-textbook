@@ -177,21 +177,29 @@ Loaded Volumes 2 (thermodynamics, E&M) and 3 (optics, modern physics). The parse
 
 ## A harder eval set (2026-10-14)
 
-The 55-case set had saturated: every pipeline with a reranker scored 95–98%, so model and fusion comparisons were within one question. `evals/retrieval_cases_hard.jsonl` adds **37 cases aimed at Vols 2–3**: 21 exact terms that live *inside* a section rather than in its title (Hall voltage, Malus's law, RC time constant, Bragg's law, work function…) and 16 everyday questions with no textbook words (tile vs. rug, bridge gaps, road signs at night…). Every gold section was checked by searching its chunks for the term or the textbook's own example. Run with `--cases evals/retrieval_cases_hard.jsonl`. `evals/LABEL_REVIEW.md` lists the original 55 cases with vector_rerank's top 3 for a manual label review (5 flagged).
+The 55-case set had saturated: every pipeline with a reranker scored 95–98%, so model and fusion comparisons were within one question. `evals/retrieval_cases_hard.jsonl` adds **55 cases aimed at Vols 2–3**:
+- **21 exact terms** that live *inside* a section rather than in its title (Hall voltage, Malus's law, RC time constant, Bragg's law, work function…).
+- **34 everyday questions** with no textbook words (tile vs. rug, bridge gaps, mummy dating, induction stove, dew on grass…), including **collision traps** like the bus case: "elevator *starts* going up", "plane *takes off*".
 
-| Method | Recall@5 | MRR | R@5 term | R@5 everyday | R@5 vol 3 |
+Every gold section was checked by searching its chunks for the term or the textbook's own example. Run with `--cases evals/retrieval_cases_hard.jsonl`. Label-review sheets with vector_rerank's top 3: `evals/LABEL_REVIEW.md` (original set, 5 flagged) and `evals/LABEL_REVIEW_HARD.md`.
+
+| Method | Recall@5 | Recall@10 | MRR | R@5 term | R@5 everyday |
 |---|---|---|---|---|---|
-| keyword (ts_rank_cd) | 65% | 0.47 | 71% | 56% | 53% |
-| vector | 92% | 0.87 | 90% | 94% | 82% |
-| **bm25** | **97%** | 0.88 | **100%** | 94% | 94% |
-| hybrid (vector + ts_rank_cd) | 92% | 0.79 | 90% | 94% | 88% |
-| **hybrid_bm25** | **100%** | **0.93** | 100% | 100% | 100% |
-| vector + rerank | 100% | 0.90 | 100% | 100% | 100% |
-| hybrid + rerank / hybrid_bm25 + rerank | 100% | 0.90 | 100% | 100% | 100% |
+| keyword (ts_rank_cd) | 60% | 75% | 0.44 | 71% | 53% |
+| vector | 89% | 93% | 0.81 | 90% | 88% |
+| hybrid (vector + ts_rank_cd) | 87% | 91% | 0.73 | 90% | 85% |
+| **bm25** | 95% | 95% | 0.83 | **100%** | 91% |
+| **hybrid_bm25** | **96%** | 98% | **0.86** | 100% | 94% |
+| vector + rerank | **96%** | 100% | 0.85 | 100% | 94% |
+| hybrid + rerank | 95% | 98% | 0.84 | 100% | 91% |
+| hybrid_bm25 + rerank | **96%** | 100% | 0.85 | 100% | 94% |
 
-- **Exact terms are where BM25 earns its place:** BM25 alone gets all 21 terms; vector misses Bragg's law and work function (both rank 6+), plus the road-sign question.
-- **hybrid_bm25 without a reranker ties the rerank pipelines on recall and has the best MRR (0.93)**, and it skips the cross-encoder pass (about 0.4 s per question; hybrid_bm25 latency itself not measured yet). On the original set it's 95% / 0.85 vs. vector + rerank 98% / 0.94, so it isn't a clear winner overall.
-- **Still not hard enough for rerankers:** all three rerank pipelines hit 100%. Distinctive term names are easy. Next round: describe a concept *without naming it* ("the angle where reflected light is completely polarized"), and terms that appear in several places (time constant in RC *and* RL, resonance in springs *and* AC circuits, Doppler for sound *and* light).
+- **BM25 is the strongest single retriever here:** 95% vs. vector's 89%, and all 21 terms (vector misses Bragg's law and work function). On everyday wording it also beats vector (91% vs. 88%): hot air balloon, northern lights, and road signs are vector misses that BM25 finds.
+- **The old ts_rank_cd hybrid is worse than vector alone** (87% vs. 89%); the BM25 hybrid is better (96%). The fusion idea was fine; the keyword scorer was the problem.
+- **hybrid_bm25 without a reranker ties the best rerank pipelines** on Recall@5 (96%) and has the best MRR (0.86), with no cross-encoder pass (~0.4 s per question).
+- **Rerankers no longer saturate:** all three miss "dew on the grass" (#148) and "pressure deeper in a pool" (#152); the cross-encoder pulls up drag/terminal-speed sections (1:5.5, 1:6.4) for the pool question.
+- **Label to review:** for #152, 1:14.6 (Bernoulli) also states "pressure increases with depth", so it may deserve to be gold too.
+- **Default unchanged for now:** on the original set vector + rerank still leads (98% vs. 95% for hybrid_bm25). Across both sets (110 cases), hybrid_bm25 + rerank and vector + rerank are within 1–2 questions. Decide after the label reviews.
 
 ## Web app: FastAPI + Next.js
 
