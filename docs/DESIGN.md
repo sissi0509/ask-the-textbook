@@ -190,7 +190,7 @@ The 55-case set had saturated: every pipeline with a reranker scored 95–98%, s
 | hybrid + rerank / hybrid_bm25 + rerank | 100% | 0.90 | 100% | 100% | 100% |
 
 - **Exact terms are where BM25 earns its place:** BM25 alone gets all 21 terms; vector misses Bragg's law and work function (both rank 6+), plus the road-sign question.
-- **hybrid_bm25 without a reranker ties the rerank pipelines on recall and has the best MRR (0.93)**, at about a tenth of the latency (no cross-encoder). On the original set it's 95% / 0.85 vs. vector + rerank 98% / 0.94, so it isn't a clear winner overall.
+- **hybrid_bm25 without a reranker ties the rerank pipelines on recall and has the best MRR (0.93)**, and it skips the cross-encoder pass (about 0.4 s per question; hybrid_bm25 latency itself not measured yet). On the original set it's 95% / 0.85 vs. vector + rerank 98% / 0.94, so it isn't a clear winner overall.
 - **Still not hard enough for rerankers:** all three rerank pipelines hit 100%. Distinctive term names are easy. Next round: describe a concept *without naming it* ("the angle where reflected light is completely polarized"), and terms that appear in several places (time constant in RC *and* RL, resonance in springs *and* AC circuits, Doppler for sound *and* light).
 
 ## Web app: FastAPI + Next.js
