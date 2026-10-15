@@ -5,7 +5,8 @@ import pytest
 
 from tutor.topics import TOPICS, topic_of
 
-CASES = Path(__file__).parents[1] / "evals" / "retrieval_cases.jsonl"
+EVALS = Path(__file__).parents[1] / "evals"
+CASE_FILES = [EVALS / "retrieval_cases.jsonl", EVALS / "retrieval_cases_hard.jsonl"]
 
 
 def test_topic_follows_volume_and_chapter():
@@ -23,8 +24,9 @@ def test_unknown_chapter_is_an_error():
         topic_of("1:18.1")
 
 
-def test_every_eval_case_has_the_topic_of_its_gold_section():
-    for line in CASES.read_text().splitlines():
+@pytest.mark.parametrize("cases", CASE_FILES, ids=lambda p: p.name)
+def test_every_eval_case_has_the_topic_of_its_gold_section(cases):
+    for line in cases.read_text().splitlines():
         case = json.loads(line)
         assert case["topic"] in TOPICS
         assert case["topic"] == topic_of(case["gold"][0]), case["id"]

@@ -5,6 +5,7 @@ A hit = any retrieved chunk whose section is one of the case's gold sections.
 Gold sections are volume-qualified ("1:5.2") because section numbers repeat across volumes.
 
 Run:  uv run python evals/run_retrieval_eval.py [--methods vector keyword hybrid]
+      [--cases evals/retrieval_cases_hard.jsonl]   (harder exact-term + everyday set)
 Writes a dated Markdown report to evals/results/.
 """
 
@@ -42,16 +43,17 @@ def score(ranks: list[int | None]) -> dict[str, float]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--methods", nargs="+", default=list(METHODS), choices=list(METHODS))
+    parser.add_argument("--cases", type=Path, default=CASES)
     args = parser.parse_args()
 
-    cases = [json.loads(line) for line in CASES.read_text().splitlines() if line.strip()]
+    cases = [json.loads(line) for line in args.cases.read_text().splitlines() if line.strip()]
     types = sorted({c["type"] for c in cases})
     volumes = sorted({int(c["gold"][0].split(":")[0]) for c in cases})  # a case's volume = its first gold section's
     topics = [t for t in TOPICS if any(c["topic"] == t for c in cases)]  # book order
     today = datetime.now().astimezone().date()
     counts = ", ".join(f"{t}: {sum(c['type'] == t for c in cases)}" for t in types)
     topic_counts = ", ".join(f"{t}: {sum(c['topic'] == t for c in cases)}" for t in topics)
-    lines = [f"# Retrieval eval, {today}", "",
+    lines = [f"# Retrieval eval, {today} (`{args.cases.name}`)", "",
              f"{len(cases)} cases ({counts}). Hit = a chunk from a gold section.",
              f"By topic: {topic_counts}.", "",
              "| Method | Recall@5 | Recall@10 | MRR | " + " | ".join(f"R@5 {t}" for t in types)
@@ -90,7 +92,8 @@ def main() -> None:
 
     report = "\n".join(lines) + "\n"
     RESULTS.mkdir(exist_ok=True)
-    out = RESULTS / f"{today}-{'-'.join(args.methods)}.md"
+    suffix = "" if args.cases == CASES else f"-{args.cases.stem.removeprefix('retrieval_cases_')}"
+    out = RESULTS / f"{today}{suffix}-{'-'.join(args.methods)}.md"
     out.write_text(report)
     print(report)
     print(f"Saved to {out}")

@@ -175,6 +175,24 @@ Loaded Volumes 2 (thermodynamics, E&M) and 3 (optics, modern physics). The parse
 - **Where BM25 should matter more:** exact-term queries on a bigger, harder eval set. The current set has only 17 term questions, and vector already gets all of them.
 - **Next fix to try (revised):** union fusion wouldn't help here, since the gold was never pushed out, and more candidates means more distractors. The weak link is the reranker on everyday wording; options are a stronger cross-encoder or HyDE (rewrite the question in textbook words before searching). Report: `evals/results/2026-10-14-bm25-hybrid-hybrid_bm25-vector_rerank-hybrid_rerank-hybrid_bm25_rerank.md`.
 
+## A harder eval set (2026-10-14)
+
+The 55-case set had saturated: every pipeline with a reranker scored 95–98%, so model and fusion comparisons were within one question. `evals/retrieval_cases_hard.jsonl` adds **37 cases aimed at Vols 2–3**: 21 exact terms that live *inside* a section rather than in its title (Hall voltage, Malus's law, RC time constant, Bragg's law, work function…) and 16 everyday questions with no textbook words (tile vs. rug, bridge gaps, road signs at night…). Every gold section was checked by searching its chunks for the term or the textbook's own example. Run with `--cases evals/retrieval_cases_hard.jsonl`. `evals/LABEL_REVIEW.md` lists the original 55 cases with vector_rerank's top 3 for a manual label review (5 flagged).
+
+| Method | Recall@5 | MRR | R@5 term | R@5 everyday | R@5 vol 3 |
+|---|---|---|---|---|---|
+| keyword (ts_rank_cd) | 65% | 0.47 | 71% | 56% | 53% |
+| vector | 92% | 0.87 | 90% | 94% | 82% |
+| **bm25** | **97%** | 0.88 | **100%** | 94% | 94% |
+| hybrid (vector + ts_rank_cd) | 92% | 0.79 | 90% | 94% | 88% |
+| **hybrid_bm25** | **100%** | **0.93** | 100% | 100% | 100% |
+| vector + rerank | 100% | 0.90 | 100% | 100% | 100% |
+| hybrid + rerank / hybrid_bm25 + rerank | 100% | 0.90 | 100% | 100% | 100% |
+
+- **Exact terms are where BM25 earns its place:** BM25 alone gets all 21 terms; vector misses Bragg's law and work function (both rank 6+), plus the road-sign question.
+- **hybrid_bm25 without a reranker ties the rerank pipelines on recall and has the best MRR (0.93)**, at about a tenth of the latency (no cross-encoder). On the original set it's 95% / 0.85 vs. vector + rerank 98% / 0.94, so it isn't a clear winner overall.
+- **Still not hard enough for rerankers:** all three rerank pipelines hit 100%. Distinctive term names are easy. Next round: describe a concept *without naming it* ("the angle where reflected light is completely polarized"), and terms that appear in several places (time constant in RC *and* RL, resonance in springs *and* AC circuits, Doppler for sound *and* light).
+
 ## Web app: FastAPI + Next.js
 
 Same stack as the negotiation trainer: a thin FastAPI layer over the existing Python code, and a one-page Next.js chat.

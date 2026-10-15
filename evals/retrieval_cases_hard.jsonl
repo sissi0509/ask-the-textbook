@@ -1,0 +1,37 @@
+{"id": 101, "type": "term", "topic": "Electricity & Magnetism", "question": "Hall voltage", "gold": ["2:11.6"]}
+{"id": 102, "type": "term", "topic": "Modern Physics", "question": "Wien's displacement law", "gold": ["3:6.1"]}
+{"id": 103, "type": "term", "topic": "Modern Physics", "question": "Stefan-Boltzmann law", "gold": ["3:6.1", "2:1.6"]}
+{"id": 104, "type": "term", "topic": "Modern Physics", "question": "Compton wavelength", "gold": ["3:6.3"]}
+{"id": 105, "type": "term", "topic": "Modern Physics", "question": "Rydberg constant", "gold": ["3:6.4"]}
+{"id": 106, "type": "term", "topic": "Optics", "question": "Brewster's angle", "gold": ["3:1.7"]}
+{"id": 107, "type": "term", "topic": "Optics", "question": "Malus's law", "gold": ["3:1.7"]}
+{"id": 108, "type": "term", "topic": "Electricity & Magnetism", "question": "Kirchhoff's junction rule", "gold": ["2:10.3"]}
+{"id": 109, "type": "term", "topic": "Electricity & Magnetism", "question": "RC time constant", "gold": ["2:10.5"]}
+{"id": 110, "type": "term", "topic": "Optics", "question": "Rayleigh criterion", "gold": ["3:4.5"]}
+{"id": 111, "type": "term", "topic": "Optics", "question": "Bragg's law", "gold": ["3:4.6"]}
+{"id": 112, "type": "term", "topic": "Thermodynamics", "question": "Maxwell-Boltzmann distribution", "gold": ["2:2.4"]}
+{"id": 113, "type": "term", "topic": "Thermodynamics", "question": "coefficient of linear expansion", "gold": ["2:1.3"]}
+{"id": 114, "type": "term", "topic": "Modern Physics", "question": "Zeeman effect", "gold": ["3:8.2"]}
+{"id": 115, "type": "term", "topic": "Electricity & Magnetism", "question": "displacement current", "gold": ["2:16.1"]}
+{"id": 116, "type": "term", "topic": "Mechanics", "question": "Coriolis force", "gold": ["1:6.3"]}
+{"id": 117, "type": "term", "topic": "Electricity & Magnetism", "question": "quality factor of a resonant circuit", "gold": ["2:15.5"]}
+{"id": 118, "type": "term", "topic": "Modern Physics", "question": "work function", "gold": ["3:6.2"]}
+{"id": 119, "type": "term", "topic": "Electricity & Magnetism", "question": "dielectric constant", "gold": ["2:8.4"]}
+{"id": 120, "type": "term", "topic": "Thermodynamics", "question": "rms speed of gas molecules", "gold": ["2:2.2"]}
+{"id": 121, "type": "term", "topic": "Thermodynamics", "question": "Clausius statement of the second law", "gold": ["2:4.4"]}
+{"id": 122, "type": "everyday", "topic": "Thermodynamics", "question": "Why does the bathroom tile feel freezing on bare feet but the rug doesn't, even in the same room?", "gold": ["2:1.6"], "note": "textbook example: carpet vs. tile floor"}
+{"id": 123, "type": "everyday", "topic": "Thermodynamics", "question": "Why do bridges have little gaps built into the road?", "gold": ["2:1.3"], "note": "expansion joints"}
+{"id": 124, "type": "everyday", "topic": "Thermodynamics", "question": "How does sweating keep me cool on a hot day?", "gold": ["2:1.6", "2:1.5"], "note": "evaporation needs latent heat (1.5); convection + phase change (1.6)"}
+{"id": 125, "type": "everyday", "topic": "Mechanics", "question": "How does a figure skater spin faster just by pulling in her arms?", "gold": ["1:11.3"], "note": "conservation of angular momentum"}
+{"id": 126, "type": "everyday", "topic": "Oscillations & Waves", "question": "If I count the seconds between the flash and the boom in a storm, how far away is it?", "gold": ["1:17.2"], "note": "light vs. sound speed"}
+{"id": 127, "type": "everyday", "topic": "Mechanics", "question": "Why does most of an iceberg hide under the water?", "gold": ["1:14.4"], "note": "buoyancy"}
+{"id": 128, "type": "everyday", "topic": "Mechanics", "question": "Why doesn't a spinning top fall over?", "gold": ["1:11.4"], "note": "precession"}
+{"id": 129, "type": "everyday", "topic": "Optics", "question": "Why do diamonds sparkle so much more than glass?", "gold": ["3:1.4"], "note": "total internal reflection, small critical angle"}
+{"id": 130, "type": "everyday", "topic": "Optics", "question": "How do fishing sunglasses let you see into the water without the shine on top?", "gold": ["3:1.7"], "note": "polarized glare"}
+{"id": 131, "type": "everyday", "topic": "Optics", "question": "Why can't I read the board from the back of the classroom, and what kind of glasses fix it?", "gold": ["3:2.5"], "note": "myopia, diverging lens"}
+{"id": 132, "type": "everyday", "topic": "Thermodynamics", "question": "Why does food cook faster in a pressure cooker?", "gold": ["2:1.5"], "note": "boiling point rises with pressure"}
+{"id": 133, "type": "everyday", "topic": "Electricity & Magnetism", "question": "Why do I get zapped by the doorknob after shuffling across the rug?", "gold": ["2:5.1"], "note": "static charge"}
+{"id": 134, "type": "everyday", "topic": "Optics", "question": "Where do the colors in a rainbow come from?", "gold": ["3:1.5"], "note": "dispersion"}
+{"id": 135, "type": "everyday", "topic": "Optics", "question": "Why do soap bubbles have swirly colors?", "gold": ["3:3.4"], "note": "thin-film interference"}
+{"id": 136, "type": "everyday", "topic": "Optics", "question": "How can doctors look inside your stomach with a thin bendy tube?", "gold": ["3:1.4"], "note": "fiber optics / endoscope"}
+{"id": 137, "type": "everyday", "topic": "Optics", "question": "Why do road signs shine so brightly in my headlights at night?", "gold": ["3:1.2"], "note": "retroreflection"}
